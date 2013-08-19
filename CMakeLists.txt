@@ -10,7 +10,7 @@ include_directories(
 add_executable(clip ges-shakem.c)
 
 set(LIBS
-gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0
+gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0
 )
 
 target_link_libraries(clip ${LIBS})
