@@ -59,7 +59,7 @@ void busMessageCb(GstBus *bus, GstMessage *message, GMainLoop *mainloop) {
       break;
     }
     case GST_MESSAGE_EOS: {
-      g_print("\n\nDone\n\n");
+      g_print("\nDone\n");
       g_main_loop_quit (mainloop);
       break;
     }
@@ -71,7 +71,7 @@ GstEncodingProfile* encoderProfile(EncodingProfile type, int width, int height, 
   GstCaps *caps;
   GstCaps *settings;
   
-  g_print("writing %s file: %s: (%s + %s) \n", 
+  g_print("Format: %s\n  Container: %s\n  Video:     %s \n  Audio:     %s\n", 
     profiles[type][3], 
     profiles[type][0], 
     profiles[type][2], 
@@ -120,7 +120,7 @@ gboolean durationQuerier(DurationPipeline *dpipeline) {
 
 void renderPipeline(GESPipeline *pipeline, EncodingProfile prof, gchar * name) {
     gchar * fileName = g_strconcat(dataPath, "export/", name, ".", profiles[prof][3], NULL);
-    g_print("filename %s \n", fileName);
+    g_print("Rendering %s\n", fileName);
      
     GstEncodingProfile* profile = encoderProfile(prof, 720, 576, 25);
     ges_pipeline_set_render_settings(pipeline, fileName, profile);
@@ -144,7 +144,16 @@ void play(GESTimeline *timeline) {
 }
 
 void render(GESTimeline *timeline, gchar * name, EncodingProfile prof) {
+  g_print("\n====\n");
+  float now = (float) g_get_monotonic_time() / (float) GST_MSECOND;
+
   runJob(timeline, name, prof);
+
+  float then = (float) g_get_monotonic_time() / (float) GST_MSECOND;
+  float dur = then - now;
+  g_print("\n====\n");
+  g_print("Rendering took %.2fs\n", dur);
+  g_print("====\n");
 }
 
 void runJob(GESTimeline *timeline, gchar * name, EncodingProfile prof) {
@@ -342,10 +351,10 @@ void main() {
   
   char * dir = get_current_dir_name();
   g_print("dir: %s\n", dir);
-  
-  /*
-  */
+
   render(testTL(), "test", PROFILE_VORBIS_VP8_WEBM);
+
+  /*
   render(testTL(), "test", PROFILE_VORBIS_THEORA_OGG);
   render(testTL(), "test", PROFILE_AAC_H264_QUICKTIME);
   render(testTL(), "test", PROFILE_VORBIS_H264_MATROSKA);
@@ -358,6 +367,7 @@ void main() {
   render(minuteTL(), "1-minute-sd", PROFILE_AAC_H264_QUICKTIME);
   
   render(effectTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+  */
   
   /*
   play(imageTL());
