@@ -1,36 +1,9 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <gst/gst.h>
-#include <ges/ges.h>
+#include "ges-demo.h"
 
-static const char *const profiles[][4] = {
-  {"application/ogg", "audio/x-vorbis", "video/x-theora", "ogv"},
-  {"video/webm", "audio/x-vorbis", "video/x-vp8", "webm"},
-  {"video/quicktime,variant=iso", "audio/mpeg,mpegversion=1,layer=3",
-      "video/x-h264", "mp4"},
-  {"video/x-matroska", "audio/x-vorbis", "video/x-h264", "mkv"},
-};
-
-typedef struct DurationPipeline DurationPipeline;
-struct DurationPipeline
-{
-  GESPipeline *pipeline;
-  GstClockTime duration;
-};
-
-typedef enum
-{
-  PROFILE_NONE = -1,
-  PROFILE_VORBIS_THEORA_OGG,
-  PROFILE_VORBIS_VP8_WEBM,
-  PROFILE_AAC_H264_QUICKTIME,
-  PROFILE_VORBIS_H264_MATROSKA,
-} EncodingProfile;
-
-gchar *dataPath;
+#include <stdlib.h>
 
 char *
-path (char *filenName)
+path (const char *filenName)
 {
   return g_strconcat (dataPath, filenName, NULL);
 }
@@ -134,7 +107,7 @@ durationQuerier (DurationPipeline * dpipeline)
 }
 
 void
-renderPipeline (GESPipeline * pipeline, EncodingProfile prof, gchar * name)
+renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar * name)
 {
   gchar *fileName =
       g_strconcat (dataPath, "export/", name, ".", profiles[prof][3], NULL);
@@ -145,43 +118,43 @@ renderPipeline (GESPipeline * pipeline, EncodingProfile prof, gchar * name)
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
 
-DurationPipeline
+DurationPipeline *
 newPipeline (GESTimeline * timeline)
 {
   GESPipeline *pipeline;
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 
-  DurationPipeline dpipeline;
-  dpipeline.pipeline = pipeline;
-  dpipeline.duration = ges_timeline_get_duration (timeline);
+  struct DurationPipeline *dpipeline = malloc(sizeof *dpipeline);
+  dpipeline->pipeline = pipeline;
+  dpipeline->duration = ges_timeline_get_duration (timeline);
 
   return dpipeline;
 }
 
 void
-runJob (GESTimeline * timeline, gchar * name, EncodingProfile prof)
+runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
 {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
 
-  DurationPipeline dpipeline = newPipeline (timeline);
+  DurationPipeline * dpipeline = newPipeline (timeline);
 
   if (name != NULL) {
-    renderPipeline (dpipeline.pipeline, prof, name);
+    renderPipeline (dpipeline->pipeline, prof, name);
   } else {
-    ges_pipeline_set_mode (dpipeline.pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
-    g_timeout_add_seconds (dpipeline.duration, (GSourceFunc) g_main_loop_quit,
+    ges_pipeline_set_mode (dpipeline->pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
+    g_timeout_add_seconds (dpipeline->duration, (GSourceFunc) g_main_loop_quit,
         mainloop);
   }
 
   GstBus *bus;
-  bus = gst_pipeline_get_bus (GST_PIPELINE (dpipeline.pipeline));
+  bus = gst_pipeline_get_bus (GST_PIPELINE (dpipeline->pipeline));
   g_signal_connect (bus, "message", (GCallback) busMessageCb, mainloop);
   g_timeout_add (100, (GSourceFunc) durationQuerier, &dpipeline);
   gst_bus_add_signal_watch (bus);
 
-  gst_element_set_state (GST_ELEMENT (dpipeline.pipeline), GST_STATE_PLAYING);
+  gst_element_set_state (GST_ELEMENT (dpipeline->pipeline), GST_STATE_PLAYING);
 
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
@@ -195,7 +168,7 @@ play (GESTimeline * timeline)
 }
 
 void
-render (GESTimeline * timeline, gchar * name, EncodingProfile prof)
+render (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
 {
   g_print ("\n====\n");
   float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
@@ -210,7 +183,7 @@ render (GESTimeline * timeline, gchar * name, EncodingProfile prof)
 }
 
 GESTimeline *
-transitionTL ()
+transitionTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -252,7 +225,7 @@ transitionTL ()
 }
 
 GESTimeline *
-effectTL ()
+effectTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -280,7 +253,7 @@ effectTL ()
 
 
 GESTimeline *
-testTL ()
+testTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -305,7 +278,7 @@ testTL ()
 
 
 GESTimeline *
-minuteTL ()
+minuteTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -316,16 +289,16 @@ minuteTL ()
   ges_timeline_add_layer (timeline, layer);
 
   placeAsset (layer,
-      path ("sd/Black Ink and Water Test - A Place in Time Song.mp4"), 
+      path ("sd/Black Ink and Water Test - A Place in Time Song.mp4"),
       0, 0, 15);
   placeAsset (layer, 
-    path ("sd/trailer_400p.ogg"), 
+    path ("sd/trailer_400p.ogg"),
     15, 2, 15);
   placeAsset (layer, 
-    path ("sd/sintel_trailer-480p.mp4"), 
+    path ("sd/sintel_trailer-480p.mp4"),
     30, 4, 15);
   placeAsset (layer,
-      path ("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"), 
+      path ("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"),
       45, 0, 15);
 
   ges_timeline_commit (timeline);
@@ -334,7 +307,7 @@ minuteTL ()
 }
 
 GESTimeline *
-imageTL ()
+imageTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -357,7 +330,7 @@ imageTL ()
 }
 
 GESTimeline *
-oneTL ()
+oneTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -381,10 +354,8 @@ main (int argc, char** argv)
   gst_init (NULL, NULL);
   ges_init ();
 
-  //char directory = get_current_dir_name ();
   char directory[1024];
   getcwd(directory, 1024);
-  //printf("%s\n", my_cwd);
 
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);

@@ -16,24 +16,16 @@ else()
     add_cflag("-O3")
 endif()
 
-#set(CMAKE_C_FLAGS "-std=c99 -w") 
-
+add_cflag("-std=c99")
 add_cflag("-Werror")
 add_cflag("-Wall")
+add_cflag("-Wuninitialized")
+add_cflag("-Wpointer-arith")
 
-#add_cflag("-Wall")
-#add_cflag("-Wextra")
-#add_cflag("-Wuninitialized")
-#add_cflag("-Wold-style-cast")
-#add_cflag("-Woverloaded-virtual")
-#add_cflag("-Wformat=2")
-#add_cflag("-Wundef")
-#add_cflag("-Wpointer-arith")
-#add_cflag("-Wcast-qual")
-#add_cflag("-Wlogical-op")
-#add_cflag("-Woverflow")
-#add_cflag("-Wmissing-declarations")
-#add_cflag("-Wredundant-decls")
+add_cflag("-Wmissing-declarations -Wmissing-prototypes -Wredundant-decls -Wundef")
+add_cflag("-Wwrite-strings -Wformat-nonliteral -Wformat-security -Wold-style-definition")
+add_cflag("-Winit-self -Wmissing-include-dirs -Waddress -Waggregate-return -Wno-multichar")
+add_cflag("-Wnested-externs")
 
 
 include_directories(
