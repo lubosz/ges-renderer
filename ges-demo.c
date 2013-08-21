@@ -158,12 +158,6 @@ newPipeline (GESTimeline * timeline)
 }
 
 void
-play (GESTimeline * timeline)
-{
-  //runJob (timeline, NULL, NULL);
-}
-
-void
 runJob (GESTimeline * timeline, gchar * name, EncodingProfile prof)
 {
   GMainLoop *mainloop;
@@ -189,6 +183,14 @@ runJob (GESTimeline * timeline, gchar * name, EncodingProfile prof)
 
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
+}
+
+void
+play (GESTimeline * timeline)
+{
+  EncodingProfile prof;
+  gchar * name = NULL;
+  runJob (timeline, name, prof);
 }
 
 void
@@ -315,13 +317,17 @@ minuteTL ()
   ges_timeline_add_layer (timeline, layer);
 
   placeAsset (layer,
-      path ("sd/Black Ink and Water Test - A Place in Time Song.mp4"), 0, 0,
-      15);
-  placeAsset (layer, path ("sd/trailer_400p.ogg"), 15, 2, 15);
-  placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 30, 4, 15);
+      path ("sd/Black Ink and Water Test - A Place in Time Song.mp4"), 
+      0, 0, 15);
+  placeAsset (layer, 
+    path ("sd/trailer_400p.ogg"), 
+    15, 2, 15);
+  placeAsset (layer, 
+    path ("sd/sintel_trailer-480p.mp4"), 
+    30, 4, 15);
   placeAsset (layer,
-      path ("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"), 45, 0,
-      15);
+      path ("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"), 
+      45, 0, 15);
 
   ges_timeline_commit (timeline);
 
