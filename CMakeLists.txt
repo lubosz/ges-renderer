@@ -13,4 +13,4 @@ set(LIBS
 gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0
 )
 
-target_link_libraries(clip ${LIBS})
+target_link_libraries(ges-demo ${LIBS})
