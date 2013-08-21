@@ -56,14 +56,14 @@ void busMessageCb(GstBus *bus, GstMessage *message, GMainLoop *mainloop) {
       break;
     }
     case GST_MESSAGE_EOS: {
-      g_print("\nDone\n");
+      g_print("\n\nDone\n\n");
       g_main_loop_quit (mainloop);
       break;
     }
   }
 }
 
-GstEncodingProfile* encoderProfile(EncodingProfile type) {
+GstEncodingProfile* encoderProfile(EncodingProfile type, int width, int height, int fps) {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
   GstCaps *settings;
@@ -79,7 +79,11 @@ GstEncodingProfile* encoderProfile(EncodingProfile type) {
   gst_caps_unref (caps);
 
   caps = gst_caps_from_string(profiles[type][2]);
-  settings = gst_caps_from_string("video/x-raw,width=720,height=576,framerate=25/1");
+  
+  char capsstring [50];
+  sprintf (capsstring, "video/x-raw,width=%d,height=%d,framerate=%d/1", width, height, fps);
+  
+  settings = gst_caps_from_string(capsstring);
   gst_encoding_container_profile_add_profile(prof,
       (GstEncodingProfile*) gst_encoding_video_profile_new(caps, NULL, settings, 0));
   gst_caps_unref (caps);
@@ -110,15 +114,14 @@ gboolean durationQuerier(DurationPipeline *dpipeline) {
   return TRUE;
 }
 
-void renderPipeline(GESPipeline *pipeline, EncodingProfile prof) {
-    gchar * fileName = g_strconcat(dataPath, "export/render.", profiles[prof][3], NULL);
+void renderPipeline(GESPipeline *pipeline, EncodingProfile prof, gchar * name) {
+    gchar * fileName = g_strconcat(dataPath, "export/", name, ".", profiles[prof][3], NULL);
     g_print("filename %s \n", fileName);
      
-    GstEncodingProfile* profile = encoderProfile(prof);
+    GstEncodingProfile* profile = encoderProfile(prof, 720, 576, 25);
     ges_pipeline_set_render_settings(pipeline, fileName, profile);
     ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
-
 
 DurationPipeline newPipeline(GESTimeline *timeline) {
   GESPipeline *pipeline;
@@ -133,21 +136,21 @@ DurationPipeline newPipeline(GESTimeline *timeline) {
 }
 
 void play(GESTimeline *timeline) {
-  runJob(timeline, NULL, FALSE);
+  runJob(timeline, NULL, NULL);
 }
 
-void render(GESTimeline *timeline, EncodingProfile prof) {
-  runJob(timeline, prof, TRUE);
+void render(GESTimeline *timeline, gchar * name, EncodingProfile prof) {
+  runJob(timeline, name, prof);
 }
 
-void runJob(GESTimeline *timeline, EncodingProfile prof, gboolean render) {
+void runJob(GESTimeline *timeline, gchar * name, EncodingProfile prof) {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
   
   DurationPipeline dpipeline = newPipeline(timeline);
 
-  if (render) {
-    renderPipeline(dpipeline.pipeline, prof);
+  if (name != NULL) {
+    renderPipeline(dpipeline.pipeline, prof, name);
   } else {
     ges_pipeline_set_mode (dpipeline.pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
     g_timeout_add_seconds (dpipeline.duration, (GSourceFunc) g_main_loop_quit, mainloop);
@@ -250,6 +253,31 @@ GESTimeline * effectTL() {
   return timeline;
 }
 
+
+GESTimeline * testTL() {
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video();
+  layer = ges_layer_new();
+
+  ges_timeline_add_layer (timeline, layer);
+  
+  GESClip * src = ges_test_clip_new();
+  
+  g_object_set (src, 
+    "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
+    "duration", 5 * GST_SECOND,
+  NULL);
+  
+  ges_layer_add_clip(layer, src);
+  
+  ges_timeline_commit(timeline);
+
+  return timeline;
+}
+
+
 GESTimeline * minuteTL() {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -284,10 +312,12 @@ void main() {
   //timeline = minuteTL();
   //timeline = effectTL();
   
-  //render(timeline, PROFILE_VORBIS_VP8_WEBM);
-  //render(timeline, PROFILE_VORBIS_H264_MATROSKA);
-  //render(timeline, PROFILE_AAC_H264_QUICKTIME);
-  render(transitionTL(), PROFILE_AAC_H264_QUICKTIME);
+  render(testTL(), "format-test", PROFILE_VORBIS_VP8_WEBM);
+  render(testTL(), "format-test", PROFILE_VORBIS_THEORA_OGG);
+  render(testTL(), "format-test", PROFILE_AAC_H264_QUICKTIME);
+  render(testTL(), "format-test", PROFILE_VORBIS_H264_MATROSKA);
+  
+  //play(testTL());
 
 }
 
