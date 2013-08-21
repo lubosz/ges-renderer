@@ -42,35 +42,24 @@ GESClip * placeAsset(GESLayer * layer, gchar * path, gint start, gint in, gint d
             GES_TRACK_TYPE_UNKNOWN);
 }
 
-GESClip *
-make_source (gchar * path, guint64 start, guint64 duration, guint64 inpoint,
-    gint priority)
-{
-
-  g_print("Loading path %s.\n S/D/I/P %d %d %d %d \n", path, start, duration, inpoint, priority);
-  gchar *uri = gst_filename_to_uri (path, NULL);
-
-  GESClip *ret = GES_CLIP (ges_uri_clip_new (uri));
-
-  g_object_set (ret,
-      "start", (guint64) start,
-      "duration", (guint64) duration,
-      "priority", (guint32) priority, "in-point", (guint64) inpoint, NULL);
-
-  g_free (uri);
-  
-  return ret;
-}
-
-GESTimeline *
-transitionTL (gchar * nick, gdouble tdur, gchar * patha, gfloat adur,
-    gdouble ainp, gchar * pathb, gfloat bdur, gdouble binp)
-{
+GESTimeline * transitionTL () {
   GESTimeline *timeline;
   GESLayer *layer1;
   GESClip *srca, *srcb;
   guint64 aduration, bduration, tduration, tstart, ainpoint, binpoint;
   GESTransitionClip *tr = NULL;
+
+  gchar * patha = path("sd/Black Ink and Water Test - A Place in Time Song.mp4");
+  gchar * pathb = path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4");
+  
+  gchar *nick = "crossfade";
+  gdouble adur, bdur, tdur, ainp, binp;
+  
+  adur = 10;
+  bdur = 10;
+  ainp = 10;
+  binp = 10;
+  tdur = 5;
 
   timeline = ges_timeline_new_audio_video();
 
@@ -86,23 +75,14 @@ transitionTL (gchar * nick, gdouble tdur, gchar * patha, gfloat adur,
   ainpoint = (guint64) (ainp * GST_SECOND);
   binpoint = (guint64) (binp * GST_SECOND);
   tstart = aduration - tduration;
-  //srca = make_source (patha, 0, aduration, ainpoint, 1);
-  //srcb = make_source (pathb, tstart, bduration, binpoint, 2);
   
-  srca = placeAsset(layer1, patha, 0, aduration, ainpoint);
-  srcb = placeAsset(layer1, pathb, tstart, bduration, binpoint);
+  srca = placeAsset(layer1, patha, 0, ainp, adur);
+  srcb = placeAsset(layer1, pathb, tstart / GST_SECOND, binp, bdur);
   
-  //ges_layer_add_clip (layer1, srca);
-  //ges_layer_add_clip (layer1, srcb);
+  g_object_set (srca, "priority", (guint32) 1,  NULL);
+  g_object_set (srcb, "priority", (guint32) 2,  NULL);
   
-  
-  //g_timeout_add_seconds (1, (GSourceFunc) print_transition_data, srca);
-  //g_timeout_add_seconds (1, (GSourceFunc) print_transition_data, srcb);
-
   if (tduration != 0) {
-    g_print ("creating transition at %" GST_TIME_FORMAT " of %f duration (%"
-        GST_TIME_FORMAT ")\n", GST_TIME_ARGS (tstart), tdur,
-        GST_TIME_ARGS (tduration));
     if (!(tr = ges_transition_clip_new_for_nick (nick)))
       g_error ("invalid transition type %s\n", nick);
 
@@ -110,9 +90,9 @@ transitionTL (gchar * nick, gdouble tdur, gchar * patha, gfloat adur,
         "start", (guint64) tstart,
         "duration", (guint64) tduration, "in-point", (guint64) 0, NULL);
     ges_layer_add_clip (layer1, GES_CLIP (tr));
-    //g_timeout_add_seconds (1, (GSourceFunc) print_transition_data, tr);
-    
   }
+  
+  ges_timeline_commit(timeline);
 
   return timeline;
 }
@@ -138,7 +118,7 @@ GESTimeline * effectTL() {
   effect1 = ges_effect_new("agingtv");
   ges_container_add(clip1, effect1);
   
-  effect2 = ges_effect_new("radioactv");
+  effect2 = ges_effect_new("rippletv");
   ges_container_add(clip2, effect2);
   
   ges_timeline_commit(timeline);
@@ -234,7 +214,6 @@ gboolean durationQuerier(DurationPipeline *dpipeline) {
 
   if (position > 0)
     g_print ("\r%.2f%% %.2f/%.2fs", percent, positionSec, durationSec);
- 
   return TRUE;
 }
 
@@ -247,10 +226,6 @@ void renderPipeline(GESPipeline *pipeline, EncodingProfile prof) {
     ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
 
-void play(DurationPipeline *pipeline, GMainLoop *mainloop) {
-    ges_pipeline_set_mode (pipeline->pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
-    g_timeout_add_seconds (pipeline->duration, (GSourceFunc) g_main_loop_quit, mainloop);
-}
 
 DurationPipeline newPipeline(GESTimeline *timeline) {
   GESPipeline *pipeline;
@@ -262,40 +237,29 @@ DurationPipeline newPipeline(GESTimeline *timeline) {
   dpipeline.duration = ges_timeline_get_duration(timeline);
   
   return dpipeline;
-  
 }
 
-void main() {
-  GESTimeline *timeline;
+void play(GESTimeline *timeline) {
+  runJob(timeline, NULL, FALSE);
+}
 
-  gst_init (NULL, NULL);
-  ges_init ();
+void render(GESTimeline *timeline, EncodingProfile prof) {
+  runJob(timeline, prof, TRUE);
+}
 
-  /*
-  gchar *type = "crossfade";
-  gdouble adur, bdur, tdur, ainpoint, binpoint;
-  
-  adur = 15;
-  bdur = 15;
-  ainpoint = 0;
-  binpoint = 0;
-  */
-  
-  //timeline = transitionTL(type, tdur, videoFile1, adur, ainpoint, videoFile2, bdur, binpoint);
-  //timeline = minuteTL();
-  timeline = effectTL();
-  
+void runJob(GESTimeline *timeline, EncodingProfile prof, gboolean render) {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
   
   DurationPipeline dpipeline = newPipeline(timeline);
 
-  renderPipeline(dpipeline.pipeline, PROFILE_VORBIS_THEORA_OGG);
-  //render(pipeline, PROFILE_VORBIS_VP8_WEBM);
-  //render(pipeline, PROFILE_VORBIS_H264_MATROSKA);
-  //render(pipeline, PROFILE_AAC_H264_QUICKTIME);
-  //play(pipeline, mainloop);
-      
+  if (render) {
+    renderPipeline(dpipeline.pipeline, prof);
+  } else {
+    ges_pipeline_set_mode (dpipeline.pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
+    g_timeout_add_seconds (dpipeline.duration, (GSourceFunc) g_main_loop_quit, mainloop);
+  }
+
   GstBus *bus;
   bus = gst_pipeline_get_bus(dpipeline.pipeline);
   g_signal_connect(bus, "message", busMessageCb, mainloop);
@@ -303,8 +267,25 @@ void main() {
   gst_bus_add_signal_watch (bus);
 
   gst_element_set_state (dpipeline.pipeline, GST_STATE_PLAYING);
-
+  
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
+}
+
+void main() {
+  GESTimeline *timeline;
+
+  gst_init (NULL, NULL);
+  ges_init ();
+  
+  //timeline = transitionTL();
+  //timeline = minuteTL();
+  //timeline = effectTL();
+  
+  //render(timeline, PROFILE_VORBIS_VP8_WEBM);
+  //render(timeline, PROFILE_VORBIS_H264_MATROSKA);
+  //render(timeline, PROFILE_AAC_H264_QUICKTIME);
+  render(transitionTL(), PROFILE_AAC_H264_QUICKTIME);
+
 }
 
