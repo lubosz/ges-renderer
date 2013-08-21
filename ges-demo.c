@@ -2,6 +2,9 @@
 
 #include <stdlib.h>
 
+static VideoSize pal = {720, 576, 25};
+static VideoSize hd = {1280, 720, 30};
+
 char *
 path (const char *filenName)
 {
@@ -54,7 +57,7 @@ busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
 }
 
 GstEncodingProfile *
-encoderProfile (EncodingProfile type, int width, int height, int fps)
+encoderProfile (EncodingProfile type, VideoSize *size)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
@@ -73,8 +76,8 @@ encoderProfile (EncodingProfile type, int width, int height, int fps)
   caps = gst_caps_from_string (profiles[type][2]);
 
   char capsstring[50];
-  sprintf (capsstring, "video/x-raw,width=%d,height=%d,framerate=%d/1", width,
-      height, fps);
+  sprintf (capsstring, "video/x-raw,width=%d,height=%d,framerate=%d/1", size->width,
+      size->height, size->fps);
 
   settings = gst_caps_from_string (capsstring);
   gst_encoding_container_profile_add_profile (prof,
@@ -114,13 +117,13 @@ durationQuerier (void)
 }
 
 void
-renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar * name)
+renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar * name, VideoSize *size)
 {
   gchar *fileName =
       g_strconcat (dataPath, "export/", name, ".", profiles[prof][3], NULL);
   g_print ("Rendering %s\n", fileName);
-
-  GstEncodingProfile *profile = encoderProfile (prof, 720, 576, 25);
+  
+  GstEncodingProfile *profile = encoderProfile (prof, size);
   ges_pipeline_set_render_settings (pipeline, fileName, profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
@@ -137,7 +140,7 @@ GESPipeline *newPipeline(GESTimeline * timeline)
 }
 
 void
-runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
+runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoSize * size)
 {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
@@ -145,7 +148,7 @@ runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
   pipeline = newPipeline (timeline);
 
   if (name != NULL) {
-    renderPipeline (pipeline, prof, name);
+    renderPipeline (pipeline, prof, name, size);
   } else {
     ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
     g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit,
@@ -168,16 +171,21 @@ void
 play (GESTimeline * timeline)
 {
   gchar * name = NULL;
-  runJob (timeline, name, PROFILE_NONE);
+  runJob (timeline, name, PROFILE_NONE, NULL);
 }
 
 void
-render (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
+render (GESTimeline * timeline, const gchar * name, EncodingProfile prof) {
+   renderWithSize (timeline, name, prof, &pal);
+}
+
+void
+renderWithSize (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoSize *size)
 {
   g_print ("\n====\n");
   float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
 
-  runJob (timeline, name, prof);
+  runJob (timeline, name, prof, size);
 
   float then = (float) g_get_monotonic_time () / (float) GST_MSECOND;
   float dur = then - now;
@@ -242,7 +250,7 @@ effectTL (void)
   ges_timeline_add_layer (timeline, layer);
 
   clip1 = placeAsset (layer, path ("sd/trailer_400p.ogg"), 0, 0, 10);
-  clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.ogv"), 10, 5, 10);
+  clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 10, 5, 10);
 
   effect1 = ges_effect_new ("agingtv");
   ges_container_add (GES_CONTAINER (clip1), GES_TIMELINE_ELEMENT (effect1));
@@ -302,7 +310,7 @@ minuteTL (void)
     path ("sd/sintel_trailer-480p.mp4"),
     30, 4, 15);
   placeAsset (layer,
-      path ("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"),
+      path ("sd/Mandelbox.mp4"),
       45, 0, 15);
 
   ges_timeline_commit (timeline);
@@ -334,6 +342,25 @@ imageTL (void)
 }
 
 GESTimeline *
+hdTL (void)
+{
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video ();
+  layer = ges_layer_new ();
+
+  ges_timeline_add_layer (timeline, layer);
+
+  placeAsset (layer, path ("hd/BlenderFluid.webm"), 0, 4, 5);
+  placeAsset (layer, path ("hd/fluidsimulation.mp4"), 5, 7, 5);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+GESTimeline *
 oneTL (void)
 {
   GESTimeline *timeline;
@@ -356,15 +383,18 @@ musicTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer = ges_layer_new ();
-  GESLayer *audiolayer = ges_layer_new ();
+  GESLayer *audiolayer1 = ges_layer_new ();
+  GESLayer *audiolayer2 = ges_layer_new ();
 
   timeline = ges_timeline_new_audio_video ();
 
   ges_timeline_add_layer (timeline, layer);
-  ges_timeline_add_layer (timeline, audiolayer);
+  ges_timeline_add_layer (timeline, audiolayer1);
+  ges_timeline_add_layer (timeline, audiolayer2);
 
-  placeAssetType (layer, path ("sd/3D fractal.webm"), 10, 0, 10, GES_TRACK_TYPE_VIDEO);
-  placeAssetType (audiolayer, path ("audio/prof.ogg"), 0, 0, 10, GES_TRACK_TYPE_AUDIO);
+  placeAssetType (layer, path ("sd/Mandelbox.mp4"), 0, 20, 10, GES_TRACK_TYPE_VIDEO);
+  placeAssetType (audiolayer1, path ("audio/prof.ogg"), 0, 0, 10, GES_TRACK_TYPE_AUDIO);
+  placeAssetType (audiolayer2, path ("audio/vask.wav"), 3, 0, 7, GES_TRACK_TYPE_AUDIO);
   
   ges_timeline_commit (timeline);
 
@@ -382,29 +412,23 @@ main (int argc, char** argv)
 
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
-
-  //render (testTL (), "test", PROFILE_VORBIS_VP8_WEBM);
   
-  play(testTL());
+  render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
+  render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
+  render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
+  render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+
+  renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
+  render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+  render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
+  render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+  render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+
+  render(imageTL(), "image", PROFILE_VORBIS_VP8_WEBM);
 
   /*
-     render(testTL(), "test", PROFILE_VORBIS_THEORA_OGG);
-     render(testTL(), "test", PROFILE_AAC_H264_QUICKTIME);
-     render(testTL(), "test", PROFILE_VORBIS_H264_MATROSKA);
-
-     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-
-
-     render(minuteTL(), "1-minute-sd", PROFILE_VORBIS_VP8_WEBM);
-     render(minuteTL(), "1-minute-sd", PROFILE_VORBIS_THEORA_OGG);
-     render(minuteTL(), "1-minute-sd", PROFILE_AAC_H264_QUICKTIME);
-
-     render(effectTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-   */
-
-  /*
+     play(hdTL());
      play(musicTL());
-     play(imageTL());
      play(testTL());
      play(transitionTL());
      play(effectTL());

@@ -23,6 +23,13 @@ typedef enum
   PROFILE_VORBIS_H264_MATROSKA,
 } EncodingProfile;
 
+typedef struct VideoSize VideoSize;
+struct VideoSize {
+  gint width;
+  gint height;
+  gint fps;
+};
+
 static gchar *dataPath;
 
 char * path (const char *filenName);
@@ -32,17 +39,18 @@ GESClip * placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, g
 
 void busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
-GstEncodingProfile * encoderProfile (EncodingProfile type, int width, int height, int fps);
+GstEncodingProfile * encoderProfile (EncodingProfile type, VideoSize *size);
 
 gboolean durationQuerier (void);
 
-void renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar *name);
+void renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar *name, VideoSize *size);
 
 GESPipeline *newPipeline(GESTimeline * timeline);
-void runJob (GESTimeline * timeline, const gchar *name, EncodingProfile prof);
+void runJob (GESTimeline * timeline, const gchar *name, EncodingProfile prof, VideoSize * size);
 
 void play (GESTimeline * timeline);
 void render (GESTimeline * timeline, const gchar * name, EncodingProfile prof);
+void renderWithSize (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoSize *size);
 
 GESTimeline * transitionTL (void);
 GESTimeline * effectTL (void);
@@ -51,6 +59,7 @@ GESTimeline * minuteTL (void);
 GESTimeline * imageTL (void);
 GESTimeline * oneTL (void);
 GESTimeline * musicTL (void);
+GESTimeline * hdTL (void);
 
 static GESPipeline *pipeline = NULL;
 static GstClockTime duration;
