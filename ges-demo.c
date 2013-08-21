@@ -25,7 +25,7 @@ typedef enum
   PROFILE_VORBIS_H264_MATROSKA,
 } EncodingProfile;
 
-gchar *dataPath = "file:///home/bmonkey/workspace/ges/data/";
+gchar *dataPath;
 
 char *
 path (char *filenName)
@@ -378,7 +378,9 @@ main ()
   ges_init ();
 
   char *dir = get_current_dir_name ();
-  g_print ("dir: %s\n", dir);
+  
+  dataPath = g_strconcat("file://", dir, "/data/", NULL);
+  g_print ("data path: %s\n", dataPath);
 
   render (testTL (), "test", PROFILE_VORBIS_VP8_WEBM);
 
