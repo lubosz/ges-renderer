@@ -114,6 +114,7 @@ gboolean durationQuerier(DurationPipeline *dpipeline) {
 
   if (position > 0)
     g_print ("\r%.2f%% %.2f/%.2fs", percent, positionSec, durationSec);
+    
   return TRUE;
 }
 
@@ -230,9 +231,9 @@ GESTimeline * effectTL() {
   
   clip1 = placeAsset(layer, path("sd/trailer_400p.ogg"),  
     0, 0, 10);
-  clip2 = placeAsset(layer, path("sd/Sintel_Trailer1.480p.DivX_Plus_HD.mkv"), 
+  clip2 = placeAsset(layer, path("sd/sintel_trailer-480p.ogv"), 
     10, 5, 10);
-  
+
   effect1 = ges_effect_new("agingtv");
   ges_container_add(clip1, effect1);
   
@@ -279,14 +280,38 @@ GESTimeline * minuteTL() {
   ges_timeline_add_layer (timeline, layer);
   
   placeAsset(layer, path("sd/Black Ink and Water Test - A Place in Time Song.mp4"),  
-    0, 0, 5);
+    0, 0, 15);
   placeAsset(layer, path("sd/trailer_400p.ogg"), 
-    5, 2, 15);
+    15, 2, 15);
   placeAsset(layer, path("sd/sintel_trailer-480p.mp4"), 
-    20, 4, 10);
+    30, 4, 15);
   placeAsset(layer, path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"), 
-    30, 0, 30);
+    45, 0, 15);
   
+  ges_timeline_commit(timeline);
+
+  return timeline;
+}
+
+GESTimeline * imageTL() {
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video();
+  layer = ges_layer_new();
+  //g_object_set (layer, "auto-transition", TRUE, NULL);
+
+  ges_timeline_add_layer (timeline, layer);
+  
+  placeAsset(layer, path("images/LAMP_720_576.jpg"), 
+    0, 0, 2);
+  placeAsset(layer, path("images/Fish.png"),  
+    2, 0, 2);
+  placeAsset(layer, path("images/PNG_transparency_demonstration_1.png"), 
+    4, 0, 2);
+  placeAsset(layer, path("images/wallpaper-1946968.jpg"), 
+    6, 0, 2);
+
   ges_timeline_commit(timeline);
 
   return timeline;
@@ -315,28 +340,31 @@ void main() {
   gst_init (NULL, NULL);
   ges_init ();
   
-  //timeline = transitionTL();
-  //timeline = minuteTL();
-  //timeline = effectTL();
-  
   char * dir = get_current_dir_name();
   g_print("dir: %s\n", dir);
   
   /*
+  */
   render(testTL(), "test", PROFILE_VORBIS_VP8_WEBM);
   render(testTL(), "test", PROFILE_VORBIS_THEORA_OGG);
   render(testTL(), "test", PROFILE_AAC_H264_QUICKTIME);
   render(testTL(), "test", PROFILE_VORBIS_H264_MATROSKA);
   
-  //render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+  render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+  
   
   render(minuteTL(), "1-minute-sd", PROFILE_VORBIS_VP8_WEBM);
   render(minuteTL(), "1-minute-sd", PROFILE_VORBIS_THEORA_OGG);
   render(minuteTL(), "1-minute-sd", PROFILE_AAC_H264_QUICKTIME);
   
-  render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-  */
+  render(effectTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
   
+  /*
+  play(imageTL());
+  play(testTL());
   play(transitionTL());
+  play(effectTL());
+  play(minuteTL());
+  */
 }
 
