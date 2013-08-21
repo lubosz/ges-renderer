@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <stdio.h>
 #include <gst/gst.h>
 #include <ges/ges.h>
 
@@ -39,7 +41,7 @@ placeAsset (GESLayer * layer, gchar * path, gint start, gint in, gint dur)
   GError **error = NULL;
   GESAsset *asset;
 
-  asset = ges_uri_clip_asset_request_sync (path, error);
+  asset = GES_ASSET(ges_uri_clip_asset_request_sync (path, error));
 
   return ges_layer_add_asset (layer, asset,
       start * GST_SECOND,
@@ -158,22 +160,7 @@ newPipeline (GESTimeline * timeline)
 void
 play (GESTimeline * timeline)
 {
-  runJob (timeline, NULL, NULL);
-}
-
-void
-render (GESTimeline * timeline, gchar * name, EncodingProfile prof)
-{
-  g_print ("\n====\n");
-  float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
-
-  runJob (timeline, name, prof);
-
-  float then = (float) g_get_monotonic_time () / (float) GST_MSECOND;
-  float dur = then - now;
-  g_print ("\n====\n");
-  g_print ("Rendering took %.2fs\n", dur);
-  g_print ("====\n");
+  //runJob (timeline, NULL, NULL);
 }
 
 void
@@ -193,17 +180,31 @@ runJob (GESTimeline * timeline, gchar * name, EncodingProfile prof)
   }
 
   GstBus *bus;
-  bus = gst_pipeline_get_bus (dpipeline.pipeline);
-  g_signal_connect (bus, "message", busMessageCb, mainloop);
+  bus = gst_pipeline_get_bus (GST_PIPELINE(dpipeline.pipeline));
+  g_signal_connect (bus, "message", (GCallback) busMessageCb, mainloop);
   g_timeout_add (100, (GSourceFunc) durationQuerier, &dpipeline);
   gst_bus_add_signal_watch (bus);
 
-  gst_element_set_state (dpipeline.pipeline, GST_STATE_PLAYING);
+  gst_element_set_state (GST_ELEMENT(dpipeline.pipeline), GST_STATE_PLAYING);
 
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
 }
 
+void
+render (GESTimeline * timeline, gchar * name, EncodingProfile prof)
+{
+  g_print ("\n====\n");
+  float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
+
+  runJob (timeline, name, prof);
+
+  float then = (float) g_get_monotonic_time () / (float) GST_MSECOND;
+  float dur = then - now;
+  g_print ("\n====\n");
+  g_print ("Rendering took %.2fs\n", dur);
+  g_print ("====\n");
+}
 
 GESTimeline *
 transitionTL ()
@@ -219,8 +220,8 @@ transitionTL ()
 
   ges_timeline_add_layer (timeline, layer);
 
-  srca = ges_test_clip_new ();
-  srcb = ges_test_clip_new ();
+  srca = GES_CLIP(ges_test_clip_new ());
+  srcb = GES_CLIP(ges_test_clip_new ());
 
   g_object_set (srca,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
@@ -266,10 +267,10 @@ effectTL ()
   clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.ogv"), 10, 5, 10);
 
   effect1 = ges_effect_new ("agingtv");
-  ges_container_add (clip1, effect1);
+  ges_container_add (GES_CONTAINER(clip1), GES_TIMELINE_ELEMENT(effect1));
 
   effect2 = ges_effect_new ("rippletv");
-  ges_container_add (clip2, effect2);
+  ges_container_add (GES_CONTAINER(clip2), GES_TIMELINE_ELEMENT(effect2));
 
   ges_timeline_commit (timeline);
 
@@ -288,7 +289,7 @@ testTL ()
 
   ges_timeline_add_layer (timeline, layer);
 
-  GESClip *src = ges_test_clip_new ();
+  GESClip *src = GES_CLIP(ges_test_clip_new ());
 
   g_object_set (src,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
@@ -377,9 +378,9 @@ main ()
   gst_init (NULL, NULL);
   ges_init ();
 
-  char *dir = get_current_dir_name ();
+  char directory = get_current_dir_name ();
   
-  dataPath = g_strconcat("file://", dir, "/data/", NULL);
+  dataPath = g_strconcat("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
 
   render (testTL (), "test", PROFILE_VORBIS_VP8_WEBM);
