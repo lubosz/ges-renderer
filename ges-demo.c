@@ -69,6 +69,8 @@ busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
       g_main_loop_quit (mainloop);
       break;
     }
+    default:
+       break;
   }
 }
 
@@ -188,9 +190,8 @@ runJob (GESTimeline * timeline, gchar * name, EncodingProfile prof)
 void
 play (GESTimeline * timeline)
 {
-  EncodingProfile prof;
   gchar * name = NULL;
-  runJob (timeline, name, prof);
+  runJob (timeline, name, PROFILE_NONE);
 }
 
 void
@@ -254,9 +255,7 @@ GESTimeline *
 effectTL ()
 {
   GESTimeline *timeline;
-  GError **error = NULL;
   GESLayer *layer;
-  GESAsset *asset1, *asset2;
   GESClip *clip1, *clip2;
   GESEffect *effect1, *effect2;
 
@@ -376,15 +375,16 @@ oneTL ()
 }
 
 
-void
-main ()
+int
+main (int argc, char** argv)
 {
-  GESTimeline *timeline;
-
   gst_init (NULL, NULL);
   ges_init ();
 
-  char directory = get_current_dir_name ();
+  //char directory = get_current_dir_name ();
+  char directory[1024];
+  getcwd(directory, 1024);
+  //printf("%s\n", my_cwd);
 
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
@@ -413,4 +413,5 @@ main ()
      play(effectTL());
      play(minuteTL());
    */
+   return 0;
 }

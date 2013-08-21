@@ -19,7 +19,7 @@ endif()
 #set(CMAKE_C_FLAGS "-std=c99 -w") 
 
 add_cflag("-Werror")
-#add_cflag("-Wall")
+add_cflag("-Wall")
 
 #add_cflag("-Wall")
 #add_cflag("-Wextra")
