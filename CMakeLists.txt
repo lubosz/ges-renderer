@@ -7,7 +7,7 @@ include_directories(
   /usr/include/glib-2.0
   /usr/lib/glib-2.0/include/
 )
-add_executable(clip ges-shakem.c)
+add_executable(ges-demo ges-shakem.c)
 
 set(LIBS
 gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0
