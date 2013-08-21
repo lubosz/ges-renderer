@@ -7,7 +7,7 @@ static const char *const profiles[][4] = {
   {"application/ogg", "audio/x-vorbis", "video/x-theora", "ogv"},
   {"video/webm", "audio/x-vorbis", "video/x-vp8", "webm"},
   {"video/quicktime,variant=iso", "audio/mpeg,mpegversion=1,layer=3",
-        "video/x-h264", "mp4"},
+      "video/x-h264", "mp4"},
   {"video/x-matroska", "audio/x-vorbis", "video/x-h264", "mkv"},
 };
 
@@ -41,7 +41,7 @@ placeAsset (GESLayer * layer, gchar * path, gint start, gint in, gint dur)
   GError **error = NULL;
   GESAsset *asset;
 
-  asset = GES_ASSET(ges_uri_clip_asset_request_sync (path, error));
+  asset = GES_ASSET (ges_uri_clip_asset_request_sync (path, error));
 
   return ges_layer_add_asset (layer, asset,
       start * GST_SECOND,
@@ -180,12 +180,12 @@ runJob (GESTimeline * timeline, gchar * name, EncodingProfile prof)
   }
 
   GstBus *bus;
-  bus = gst_pipeline_get_bus (GST_PIPELINE(dpipeline.pipeline));
+  bus = gst_pipeline_get_bus (GST_PIPELINE (dpipeline.pipeline));
   g_signal_connect (bus, "message", (GCallback) busMessageCb, mainloop);
   g_timeout_add (100, (GSourceFunc) durationQuerier, &dpipeline);
   gst_bus_add_signal_watch (bus);
 
-  gst_element_set_state (GST_ELEMENT(dpipeline.pipeline), GST_STATE_PLAYING);
+  gst_element_set_state (GST_ELEMENT (dpipeline.pipeline), GST_STATE_PLAYING);
 
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
@@ -220,8 +220,8 @@ transitionTL ()
 
   ges_timeline_add_layer (timeline, layer);
 
-  srca = GES_CLIP(ges_test_clip_new ());
-  srcb = GES_CLIP(ges_test_clip_new ());
+  srca = GES_CLIP (ges_test_clip_new ());
+  srcb = GES_CLIP (ges_test_clip_new ());
 
   g_object_set (srca,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
@@ -267,10 +267,10 @@ effectTL ()
   clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.ogv"), 10, 5, 10);
 
   effect1 = ges_effect_new ("agingtv");
-  ges_container_add (GES_CONTAINER(clip1), GES_TIMELINE_ELEMENT(effect1));
+  ges_container_add (GES_CONTAINER (clip1), GES_TIMELINE_ELEMENT (effect1));
 
   effect2 = ges_effect_new ("rippletv");
-  ges_container_add (GES_CONTAINER(clip2), GES_TIMELINE_ELEMENT(effect2));
+  ges_container_add (GES_CONTAINER (clip2), GES_TIMELINE_ELEMENT (effect2));
 
   ges_timeline_commit (timeline);
 
@@ -289,7 +289,7 @@ testTL ()
 
   ges_timeline_add_layer (timeline, layer);
 
-  GESClip *src = GES_CLIP(ges_test_clip_new ());
+  GESClip *src = GES_CLIP (ges_test_clip_new ());
 
   g_object_set (src,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
@@ -379,8 +379,8 @@ main ()
   ges_init ();
 
   char directory = get_current_dir_name ();
-  
-  dataPath = g_strconcat("file://", &directory, "/data/", NULL);
+
+  dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
 
   render (testTL (), "test", PROFILE_VORBIS_VP8_WEBM);
