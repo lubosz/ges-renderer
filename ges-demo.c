@@ -1,6 +1,9 @@
 #include <gst/gst.h>
 #include <ges/ges.h>
 
+
+#include <unistd.h>
+
 static const char * const profiles[][4] = {
   { "application/ogg", "audio/x-vorbis", "video/x-theora", "ogv" },
   { "video/webm", "audio/x-vorbis", "video/x-vp8", "webm"},
@@ -171,54 +174,42 @@ void runJob(GESTimeline *timeline, gchar * name, EncodingProfile prof) {
 
 GESTimeline * transitionTL () {
   GESTimeline *timeline;
-  GESLayer *layer1;
+  GESLayer *layer;
   GESClip *srca, *srcb;
-  guint64 aduration, bduration, tduration, tstart, ainpoint, binpoint;
-  GESTransitionClip *tr = NULL;
-
-  gchar * patha = path("sd/Black Ink and Water Test - A Place in Time Song.mp4");
-  gchar * pathb = path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4");
   
-  gchar *nick = "crossfade";
-  gdouble adur, bdur, tdur, ainp, binp;
-  
-  adur = 10;
-  bdur = 10;
-  ainp = 10;
-  binp = 10;
-  tdur = 5;
-
   timeline = ges_timeline_new_audio_video();
 
-  layer1 = GES_LAYER (ges_layer_new ());
-  g_object_set (layer1, "priority", (gint32) 0, NULL);
+  layer = ges_layer_new();
+  g_object_set (layer, "auto-transition", TRUE, NULL);
+  
+  ges_timeline_add_layer (timeline, layer);
+  
+  srca = ges_test_clip_new();
+  srcb = ges_test_clip_new();
+  
+  g_object_set (srca, 
+    "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE, 
+    "duration", 5 * GST_SECOND, 
+    NULL);
 
-  if (!ges_timeline_add_layer (timeline, layer1))
-    exit (-1);
-
-  aduration = (guint64) (adur * GST_SECOND);
-  bduration = (guint64) (bdur * GST_SECOND);
-  tduration = (guint64) (tdur * GST_SECOND);
-  ainpoint = (guint64) (ainp * GST_SECOND);
-  binpoint = (guint64) (binp * GST_SECOND);
-  tstart = aduration - tduration;
+  g_object_set (srcb, 
+    "vpattern", GES_VIDEO_TEST_PATTERN_CIRCULAR,
+    "duration", 5 * GST_SECOND,
+    "start", 2 * GST_SECOND,
+  NULL);
   
-  srca = placeAsset(layer1, patha, 0, ainp, adur);
-  srcb = placeAsset(layer1, pathb, tstart / GST_SECOND, binp, bdur);
+  ges_layer_add_clip(layer, srca);
+  ges_layer_add_clip(layer, srcb);
   
-  g_object_set (srca, "priority", (guint32) 1,  NULL);
-  g_object_set (srcb, "priority", (guint32) 2,  NULL);
-  
-  if (tduration != 0) {
-    if (!(tr = ges_transition_clip_new_for_nick (nick)))
-      g_error ("invalid transition type %s\n", nick);
-
-    g_object_set (tr,
-        "start", (guint64) tstart,
-        "duration", (guint64) tduration, "in-point", (guint64) 0, NULL);
-    ges_layer_add_clip (layer1, GES_CLIP (tr));
-  }
-  
+  /*
+  tr = ges_transition_clip_new_for_nick ("crossfade");
+  g_object_set (tr,
+        "start", tdur * GST_SECOND,
+        "duration", tst * GST_SECOND, 
+        "in-point", 0, 
+        NULL);
+  ges_layer_add_clip (layer1, GES_CLIP (tr));
+  */
   ges_timeline_commit(timeline);
 
   return timeline;
@@ -301,6 +292,22 @@ GESTimeline * minuteTL() {
   return timeline;
 }
 
+GESTimeline * oneTL() {
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video();
+  layer = ges_layer_new();
+
+  ges_timeline_add_layer (timeline, layer);
+  
+  placeAsset(layer, path("sd/trailer_400p.ogg"), 0, 0, 5);
+  
+  ges_timeline_commit(timeline);
+
+  return timeline;
+}
+
 
 void main() {
   GESTimeline *timeline;
@@ -312,12 +319,24 @@ void main() {
   //timeline = minuteTL();
   //timeline = effectTL();
   
-  render(testTL(), "format-test", PROFILE_VORBIS_VP8_WEBM);
-  render(testTL(), "format-test", PROFILE_VORBIS_THEORA_OGG);
-  render(testTL(), "format-test", PROFILE_AAC_H264_QUICKTIME);
-  render(testTL(), "format-test", PROFILE_VORBIS_H264_MATROSKA);
+  char * dir = get_current_dir_name();
+  g_print("dir: %s\n", dir);
   
-  //play(testTL());
-
+  /*
+  render(testTL(), "test", PROFILE_VORBIS_VP8_WEBM);
+  render(testTL(), "test", PROFILE_VORBIS_THEORA_OGG);
+  render(testTL(), "test", PROFILE_AAC_H264_QUICKTIME);
+  render(testTL(), "test", PROFILE_VORBIS_H264_MATROSKA);
+  
+  //render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+  
+  render(minuteTL(), "1-minute-sd", PROFILE_VORBIS_VP8_WEBM);
+  render(minuteTL(), "1-minute-sd", PROFILE_VORBIS_THEORA_OGG);
+  render(minuteTL(), "1-minute-sd", PROFILE_AAC_H264_QUICKTIME);
+  
+  render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+  */
+  
+  play(transitionTL());
 }
 
