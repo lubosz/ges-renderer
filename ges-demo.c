@@ -11,6 +11,12 @@ path (const char *filenName)
 GESClip *
 placeAsset (GESLayer * layer, gchar * path, gint start, gint in, gint dur)
 {
+  return placeAssetType (layer, path, start, in, dur, GES_TRACK_TYPE_UNKNOWN);
+}
+
+GESClip *
+placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur, GESTrackType tt)
+{
   GError **error = NULL;
   GESAsset *asset;
 
@@ -18,7 +24,7 @@ placeAsset (GESLayer * layer, gchar * path, gint start, gint in, gint dur)
 
   return ges_layer_add_asset (layer, asset,
       start * GST_SECOND,
-      in * GST_SECOND, dur * GST_SECOND, GES_TRACK_TYPE_UNKNOWN);
+      in * GST_SECOND, dur * GST_SECOND, tt);
 }
 
 void
@@ -89,16 +95,17 @@ encoderProfile (EncodingProfile type, int width, int height, int fps)
 }
 
 gboolean
-durationQuerier (DurationPipeline * dpipeline)
+durationQuerier (void)
 {
   gint64 position;
-  gst_element_query_position (GST_ELEMENT (dpipeline->pipeline),
+  
+  gst_element_query_position (GST_ELEMENT (pipeline),
       GST_FORMAT_TIME, &position);
 
-  float percent = (float) position * 100 / (float) dpipeline->duration;
+  float percent = (float) position * 100 / (float) duration;
 
   float positionSec = (float) position / GST_SECOND;
-  float durationSec = (float) dpipeline->duration / GST_SECOND;
+  float durationSec = (float) duration / GST_SECOND;
 
   if (position > 0)
     g_print ("\r%.2f%% %.2f/%.2fs", percent, positionSec, durationSec);
@@ -118,18 +125,15 @@ renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar * name
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
 
-DurationPipeline *
-newPipeline (GESTimeline * timeline)
+GESPipeline *newPipeline(GESTimeline * timeline)
 {
   GESPipeline *pipeline;
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 
-  struct DurationPipeline *dpipeline = malloc(sizeof *dpipeline);
-  dpipeline->pipeline = pipeline;
-  dpipeline->duration = ges_timeline_get_duration (timeline);
+  duration = ges_timeline_get_duration (timeline);
 
-  return dpipeline;
+  return pipeline;
 }
 
 void
@@ -138,23 +142,23 @@ runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
 
-  DurationPipeline * dpipeline = newPipeline (timeline);
+  pipeline = newPipeline (timeline);
 
   if (name != NULL) {
-    renderPipeline (dpipeline->pipeline, prof, name);
+    renderPipeline (pipeline, prof, name);
   } else {
-    ges_pipeline_set_mode (dpipeline->pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
-    g_timeout_add_seconds (dpipeline->duration, (GSourceFunc) g_main_loop_quit,
+    ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
+    g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit,
         mainloop);
   }
 
   GstBus *bus;
-  bus = gst_pipeline_get_bus (GST_PIPELINE (dpipeline->pipeline));
+  bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
   g_signal_connect (bus, "message", (GCallback) busMessageCb, mainloop);
-  g_timeout_add (100, (GSourceFunc) durationQuerier, &dpipeline);
+  g_timeout_add (100, (GSourceFunc) durationQuerier, NULL);
   gst_bus_add_signal_watch (bus);
 
-  gst_element_set_state (GST_ELEMENT (dpipeline->pipeline), GST_STATE_PLAYING);
+  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
@@ -347,6 +351,25 @@ oneTL (void)
   return timeline;
 }
 
+GESTimeline *
+musicTL (void)
+{
+  GESTimeline *timeline;
+  GESLayer *layer = ges_layer_new ();
+  GESLayer *audiolayer = ges_layer_new ();
+
+  timeline = ges_timeline_new_audio_video ();
+
+  ges_timeline_add_layer (timeline, layer);
+  ges_timeline_add_layer (timeline, audiolayer);
+
+  placeAssetType (layer, path ("sd/3D fractal.webm"), 10, 0, 10, GES_TRACK_TYPE_VIDEO);
+  placeAssetType (audiolayer, path ("audio/prof.ogg"), 0, 0, 10, GES_TRACK_TYPE_AUDIO);
+  
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
 
 int
 main (int argc, char** argv)
@@ -360,7 +383,9 @@ main (int argc, char** argv)
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
 
-  render (testTL (), "test", PROFILE_VORBIS_VP8_WEBM);
+  //render (testTL (), "test", PROFILE_VORBIS_VP8_WEBM);
+  
+  play(testTL());
 
   /*
      render(testTL(), "test", PROFILE_VORBIS_THEORA_OGG);
@@ -378,6 +403,7 @@ main (int argc, char** argv)
    */
 
   /*
+     play(musicTL());
      play(imageTL());
      play(testTL());
      play(transitionTL());

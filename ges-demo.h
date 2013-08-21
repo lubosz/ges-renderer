@@ -14,13 +14,6 @@ static const char *const profiles[][4] = {
   {"video/x-matroska", "audio/x-vorbis", "video/x-h264", "mkv"},
 };
 
-typedef struct DurationPipeline DurationPipeline;
-struct DurationPipeline
-{
-  GESPipeline *pipeline;
-  GstClockTime duration;
-};
-
 typedef enum
 {
   PROFILE_NONE = -1,
@@ -30,21 +23,22 @@ typedef enum
   PROFILE_VORBIS_H264_MATROSKA,
 } EncodingProfile;
 
-gchar *dataPath;
+static gchar *dataPath;
 
 char * path (const char *filenName);
 
 GESClip * placeAsset (GESLayer * layer, gchar * get_path, gint start, gint in, gint dur);
+GESClip * placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur, GESTrackType tt);
 
 void busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
 GstEncodingProfile * encoderProfile (EncodingProfile type, int width, int height, int fps);
 
-gboolean durationQuerier (DurationPipeline * dpipeline);
+gboolean durationQuerier (void);
 
 void renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar *name);
 
-DurationPipeline *newPipeline(GESTimeline * timeline);
+GESPipeline *newPipeline(GESTimeline * timeline);
 void runJob (GESTimeline * timeline, const gchar *name, EncodingProfile prof);
 
 void play (GESTimeline * timeline);
@@ -56,5 +50,9 @@ GESTimeline * testTL (void);
 GESTimeline * minuteTL (void);
 GESTimeline * imageTL (void);
 GESTimeline * oneTL (void);
+GESTimeline * musicTL (void);
+
+static GESPipeline *pipeline = NULL;
+static GstClockTime duration;
 
 #endif // GESDEMO_H
