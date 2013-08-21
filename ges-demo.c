@@ -42,113 +42,6 @@ GESClip * placeAsset(GESLayer * layer, gchar * path, gint start, gint in, gint d
             GES_TRACK_TYPE_UNKNOWN);
 }
 
-GESTimeline * transitionTL () {
-  GESTimeline *timeline;
-  GESLayer *layer1;
-  GESClip *srca, *srcb;
-  guint64 aduration, bduration, tduration, tstart, ainpoint, binpoint;
-  GESTransitionClip *tr = NULL;
-
-  gchar * patha = path("sd/Black Ink and Water Test - A Place in Time Song.mp4");
-  gchar * pathb = path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4");
-  
-  gchar *nick = "crossfade";
-  gdouble adur, bdur, tdur, ainp, binp;
-  
-  adur = 10;
-  bdur = 10;
-  ainp = 10;
-  binp = 10;
-  tdur = 5;
-
-  timeline = ges_timeline_new_audio_video();
-
-  layer1 = GES_LAYER (ges_layer_new ());
-  g_object_set (layer1, "priority", (gint32) 0, NULL);
-
-  if (!ges_timeline_add_layer (timeline, layer1))
-    exit (-1);
-
-  aduration = (guint64) (adur * GST_SECOND);
-  bduration = (guint64) (bdur * GST_SECOND);
-  tduration = (guint64) (tdur * GST_SECOND);
-  ainpoint = (guint64) (ainp * GST_SECOND);
-  binpoint = (guint64) (binp * GST_SECOND);
-  tstart = aduration - tduration;
-  
-  srca = placeAsset(layer1, patha, 0, ainp, adur);
-  srcb = placeAsset(layer1, pathb, tstart / GST_SECOND, binp, bdur);
-  
-  g_object_set (srca, "priority", (guint32) 1,  NULL);
-  g_object_set (srcb, "priority", (guint32) 2,  NULL);
-  
-  if (tduration != 0) {
-    if (!(tr = ges_transition_clip_new_for_nick (nick)))
-      g_error ("invalid transition type %s\n", nick);
-
-    g_object_set (tr,
-        "start", (guint64) tstart,
-        "duration", (guint64) tduration, "in-point", (guint64) 0, NULL);
-    ges_layer_add_clip (layer1, GES_CLIP (tr));
-  }
-  
-  ges_timeline_commit(timeline);
-
-  return timeline;
-}
-
-GESTimeline * effectTL() {
-  GESTimeline *timeline;
-  GError **error = NULL;
-  GESLayer *layer;
-  GESAsset *asset1,*asset2;
-  GESClip * clip1, *clip2;
-  GESEffect * effect1, *effect2;
-
-  timeline = ges_timeline_new_audio_video();
-  layer = ges_layer_new();
-
-  ges_timeline_add_layer (timeline, layer);
-  
-  clip1 = placeAsset(layer, path("sd/trailer_400p.ogg"),  
-    0, 0, 10);
-  clip2 = placeAsset(layer, path("sd/Sintel_Trailer1.480p.DivX_Plus_HD.mkv"), 
-    10, 5, 10);
-  
-  effect1 = ges_effect_new("agingtv");
-  ges_container_add(clip1, effect1);
-  
-  effect2 = ges_effect_new("rippletv");
-  ges_container_add(clip2, effect2);
-  
-  ges_timeline_commit(timeline);
-
-  return timeline;
-}
-
-GESTimeline * minuteTL() {
-  GESTimeline *timeline;
-  GESLayer *layer;
-
-  timeline = ges_timeline_new_audio_video();
-  layer = ges_layer_new();
-
-  ges_timeline_add_layer (timeline, layer);
-  
-  placeAsset(layer, path("sd/Black Ink and Water Test - A Place in Time Song.mp4"),  
-    0, 0, 5);
-  placeAsset(layer, path("sd/trailer_400p.ogg"), 
-    5, 2, 15);
-  placeAsset(layer, path("sd/sintel_trailer-480p.mp4"), 
-    20, 4, 10);
-  placeAsset(layer, path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"), 
-    30, 0, 30);
-  
-  ges_timeline_commit(timeline);
-
-  return timeline;
-}
-
 void busMessageCb(GstBus *bus, GstMessage *message, GMainLoop *mainloop) {
   switch (GST_MESSAGE_TYPE (message)) {
     case GST_MESSAGE_ERROR: {
@@ -271,6 +164,115 @@ void runJob(GESTimeline *timeline, EncodingProfile prof, gboolean render) {
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
 }
+
+
+GESTimeline * transitionTL () {
+  GESTimeline *timeline;
+  GESLayer *layer1;
+  GESClip *srca, *srcb;
+  guint64 aduration, bduration, tduration, tstart, ainpoint, binpoint;
+  GESTransitionClip *tr = NULL;
+
+  gchar * patha = path("sd/Black Ink and Water Test - A Place in Time Song.mp4");
+  gchar * pathb = path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4");
+  
+  gchar *nick = "crossfade";
+  gdouble adur, bdur, tdur, ainp, binp;
+  
+  adur = 10;
+  bdur = 10;
+  ainp = 10;
+  binp = 10;
+  tdur = 5;
+
+  timeline = ges_timeline_new_audio_video();
+
+  layer1 = GES_LAYER (ges_layer_new ());
+  g_object_set (layer1, "priority", (gint32) 0, NULL);
+
+  if (!ges_timeline_add_layer (timeline, layer1))
+    exit (-1);
+
+  aduration = (guint64) (adur * GST_SECOND);
+  bduration = (guint64) (bdur * GST_SECOND);
+  tduration = (guint64) (tdur * GST_SECOND);
+  ainpoint = (guint64) (ainp * GST_SECOND);
+  binpoint = (guint64) (binp * GST_SECOND);
+  tstart = aduration - tduration;
+  
+  srca = placeAsset(layer1, patha, 0, ainp, adur);
+  srcb = placeAsset(layer1, pathb, tstart / GST_SECOND, binp, bdur);
+  
+  g_object_set (srca, "priority", (guint32) 1,  NULL);
+  g_object_set (srcb, "priority", (guint32) 2,  NULL);
+  
+  if (tduration != 0) {
+    if (!(tr = ges_transition_clip_new_for_nick (nick)))
+      g_error ("invalid transition type %s\n", nick);
+
+    g_object_set (tr,
+        "start", (guint64) tstart,
+        "duration", (guint64) tduration, "in-point", (guint64) 0, NULL);
+    ges_layer_add_clip (layer1, GES_CLIP (tr));
+  }
+  
+  ges_timeline_commit(timeline);
+
+  return timeline;
+}
+
+GESTimeline * effectTL() {
+  GESTimeline *timeline;
+  GError **error = NULL;
+  GESLayer *layer;
+  GESAsset *asset1,*asset2;
+  GESClip * clip1, *clip2;
+  GESEffect * effect1, *effect2;
+
+  timeline = ges_timeline_new_audio_video();
+  layer = ges_layer_new();
+
+  ges_timeline_add_layer (timeline, layer);
+  
+  clip1 = placeAsset(layer, path("sd/trailer_400p.ogg"),  
+    0, 0, 10);
+  clip2 = placeAsset(layer, path("sd/Sintel_Trailer1.480p.DivX_Plus_HD.mkv"), 
+    10, 5, 10);
+  
+  effect1 = ges_effect_new("agingtv");
+  ges_container_add(clip1, effect1);
+  
+  effect2 = ges_effect_new("rippletv");
+  ges_container_add(clip2, effect2);
+  
+  ges_timeline_commit(timeline);
+
+  return timeline;
+}
+
+GESTimeline * minuteTL() {
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video();
+  layer = ges_layer_new();
+
+  ges_timeline_add_layer (timeline, layer);
+  
+  placeAsset(layer, path("sd/Black Ink and Water Test - A Place in Time Song.mp4"),  
+    0, 0, 5);
+  placeAsset(layer, path("sd/trailer_400p.ogg"), 
+    5, 2, 15);
+  placeAsset(layer, path("sd/sintel_trailer-480p.mp4"), 
+    20, 4, 10);
+  placeAsset(layer, path("sd/Sesame Street- Kermit and Joey Say the Alphabet.mp4"), 
+    30, 0, 30);
+  
+  ges_timeline_commit(timeline);
+
+  return timeline;
+}
+
 
 void main() {
   GESTimeline *timeline;
