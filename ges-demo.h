@@ -31,7 +31,8 @@ typedef enum
 } EncodingProfile;
 
 typedef struct VideoSize VideoSize;
-struct VideoSize {
+struct VideoSize
+{
   gint width;
   gint height;
   gint fps;
@@ -39,34 +40,39 @@ struct VideoSize {
 
 static gchar *dataPath;
 
-char * path (const char *filenName);
+char *path (const char *filenName);
 
-GESClip * placeAsset (GESLayer * layer, gchar * get_path, gint start, gint in, gint dur);
-GESClip * placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur, GESTrackType tt);
+GESClip *placeAsset (GESLayer * layer, gchar * get_path, gint start, gint in,
+    gint dur);
+GESClip *placeAssetType (GESLayer * layer, gchar * path, gint start, gint in,
+    gint dur, GESTrackType tt);
 
 void busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
-GstEncodingProfile * encoderProfile (EncodingProfile type, VideoSize *size);
+GstEncodingProfile *encoderProfile (EncodingProfile type, VideoSize * size);
 
 gboolean durationQuerier (void);
 
-void renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar *name, VideoSize *size);
+void renderPipeline (GESPipeline * pipeline, EncodingProfile prof,
+    const gchar * name, VideoSize * size);
 
-GESPipeline *newPipeline(GESTimeline * timeline);
-void runJob (GESTimeline * timeline, const gchar *name, EncodingProfile prof, VideoSize * size);
+GESPipeline *newPipeline (GESTimeline * timeline);
+void runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
+    VideoSize * size);
 
 void play (GESTimeline * timeline);
 void render (GESTimeline * timeline, const gchar * name, EncodingProfile prof);
-void renderWithSize (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoSize *size);
+void renderWithSize (GESTimeline * timeline, const gchar * name,
+    EncodingProfile prof, VideoSize * size);
 
-GESTimeline * transitionTL (void);
-GESTimeline * effectTL (void);
-GESTimeline * testTL (void);
-GESTimeline * minuteTL (void);
-GESTimeline * imageTL (void);
-GESTimeline * oneTL (void);
-GESTimeline * musicTL (void);
-GESTimeline * hdTL (void);
+GESTimeline *transitionTL (void);
+GESTimeline *effectTL (void);
+GESTimeline *testTL (void);
+GESTimeline *minuteTL (void);
+GESTimeline *imageTL (void);
+GESTimeline *oneTL (void);
+GESTimeline *musicTL (void);
+GESTimeline *hdTL (void);
 
 static GESPipeline *pipeline = NULL;
 static GstClockTime duration;

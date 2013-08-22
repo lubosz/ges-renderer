@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
-static VideoSize pal = {720, 576, 25};
-static VideoSize hd = {1280, 720, 30};
+static VideoSize pal = { 720, 576, 25 };
+static VideoSize hd = { 1280, 720, 30 };
 
 char *
 path (const char *filenName)
@@ -25,7 +25,8 @@ placeAsset (GESLayer * layer, gchar * path, gint start, gint in, gint dur)
 }
 
 GESClip *
-placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur, GESTrackType tt)
+placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur,
+    GESTrackType tt)
 {
   GError **error = NULL;
   GESAsset *asset;
@@ -33,8 +34,7 @@ placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur, G
   asset = GES_ASSET (ges_uri_clip_asset_request_sync (path, error));
 
   return ges_layer_add_asset (layer, asset,
-      start * GST_SECOND,
-      in * GST_SECOND, dur * GST_SECOND, tt);
+      start * GST_SECOND, in * GST_SECOND, dur * GST_SECOND, tt);
 }
 
 void
@@ -59,12 +59,12 @@ busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
       break;
     }
     default:
-       break;
+      break;
   }
 }
 
 GstEncodingProfile *
-encoderProfile (EncodingProfile type, VideoSize *size)
+encoderProfile (EncodingProfile type, VideoSize * size)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
@@ -83,8 +83,8 @@ encoderProfile (EncodingProfile type, VideoSize *size)
   caps = gst_caps_from_string (profiles[type][2]);
 
   char capsstring[50];
-  sprintf (capsstring, "video/x-raw,width=%d,height=%d,framerate=%d/1", size->width,
-      size->height, size->fps);
+  sprintf (capsstring, "video/x-raw,width=%d,height=%d,framerate=%d/1",
+      size->width, size->height, size->fps);
 
   settings = gst_caps_from_string (capsstring);
   gst_encoding_container_profile_add_profile (prof,
@@ -108,7 +108,7 @@ gboolean
 durationQuerier (void)
 {
   gint64 position;
-  
+
   gst_element_query_position (GST_ELEMENT (pipeline),
       GST_FORMAT_TIME, &position);
 
@@ -124,18 +124,20 @@ durationQuerier (void)
 }
 
 void
-renderPipeline (GESPipeline * pipeline, EncodingProfile prof, const gchar * name, VideoSize *size)
+renderPipeline (GESPipeline * pipeline, EncodingProfile prof,
+    const gchar * name, VideoSize * size)
 {
   gchar *fileName =
       g_strconcat (dataPath, "export/", name, ".", profiles[prof][3], NULL);
   g_print ("Rendering %s\n", fileName);
-  
+
   GstEncodingProfile *profile = encoderProfile (prof, size);
   ges_pipeline_set_render_settings (pipeline, fileName, profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
 
-GESPipeline *newPipeline(GESTimeline * timeline)
+GESPipeline *
+newPipeline (GESTimeline * timeline)
 {
   GESPipeline *pipeline;
   pipeline = ges_pipeline_new ();
@@ -147,7 +149,8 @@ GESPipeline *newPipeline(GESTimeline * timeline)
 }
 
 void
-runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoSize * size)
+runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
+    VideoSize * size)
 {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
@@ -158,8 +161,7 @@ runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoS
     renderPipeline (pipeline, prof, name, size);
   } else {
     ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
-    g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit,
-        mainloop);
+    g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit, mainloop);
   }
 
   GstBus *bus;
@@ -177,17 +179,19 @@ runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoS
 void
 play (GESTimeline * timeline)
 {
-  gchar * name = NULL;
+  gchar *name = NULL;
   runJob (timeline, name, PROFILE_NONE, NULL);
 }
 
 void
-render (GESTimeline * timeline, const gchar * name, EncodingProfile prof) {
-   renderWithSize (timeline, name, prof, &pal);
+render (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
+{
+  renderWithSize (timeline, name, prof, &pal);
 }
 
 void
-renderWithSize (GESTimeline * timeline, const gchar * name, EncodingProfile prof, VideoSize *size)
+renderWithSize (GESTimeline * timeline, const gchar * name,
+    EncodingProfile prof, VideoSize * size)
 {
   g_print ("\n====\n");
   float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
@@ -224,10 +228,8 @@ transitionTL (void)
 
   g_object_set (srcb,
       "vpattern", GES_VIDEO_TEST_PATTERN_CIRCULAR,
-      "duration", 5 * GST_SECOND, 
-      "start", 2 * GST_SECOND, 
-      NULL);
-      
+      "duration", 5 * GST_SECOND, "start", 2 * GST_SECOND, NULL);
+
   ges_test_clip_set_frequency (srcb, 800);
 
   ges_layer_add_clip (layer, GES_CLIP (srca));
@@ -314,15 +316,9 @@ minuteTL (void)
   placeAsset (layer,
       path ("sd/Black Ink and Water Test - A Place in Time Song.mp4"),
       0, 0, 15);
-  placeAsset (layer, 
-    path ("sd/trailer_400p.ogg"),
-    15, 2, 15);
-  placeAsset (layer, 
-    path ("sd/sintel_trailer-480p.mp4"),
-    30, 4, 15);
-  placeAsset (layer,
-      path ("sd/Mandelbox.mp4"),
-      45, 0, 15);
+  placeAsset (layer, path ("sd/trailer_400p.ogg"), 15, 2, 15);
+  placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 30, 4, 15);
+  placeAsset (layer, path ("sd/Mandelbox.mp4"), 45, 0, 15);
 
   ges_timeline_commit (timeline);
 
@@ -403,44 +399,47 @@ musicTL (void)
   ges_timeline_add_layer (timeline, audiolayer1);
   ges_timeline_add_layer (timeline, audiolayer2);
 
-  placeAssetType (layer, path ("sd/Mandelbox.mp4"), 0, 20, 10, GES_TRACK_TYPE_VIDEO);
-  placeAssetType (audiolayer1, path ("audio/prof.ogg"), 0, 0, 10, GES_TRACK_TYPE_AUDIO);
-  placeAssetType (audiolayer2, path ("audio/vask.wav"), 3, 0, 7, GES_TRACK_TYPE_AUDIO);
-  
+  placeAssetType (layer, path ("sd/Mandelbox.mp4"), 0, 20, 10,
+      GES_TRACK_TYPE_VIDEO);
+  placeAssetType (audiolayer1, path ("audio/prof.ogg"), 0, 0, 10,
+      GES_TRACK_TYPE_AUDIO);
+  placeAssetType (audiolayer2, path ("audio/vask.wav"), 3, 0, 7,
+      GES_TRACK_TYPE_AUDIO);
+
   ges_timeline_commit (timeline);
 
   return timeline;
 }
 
 int
-main (int argc, char** argv)
+main (int argc, char **argv)
 {
   gst_init (NULL, NULL);
   ges_init ();
 
   char directory[1024];
-  getcwd(directory, 1024);
+  getcwd (directory, 1024);
 
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
-  
-  play(transitionTL());
-  
-  g_print("%d\n", hd.width);
+
+  play (transitionTL ());
+
+  g_print ("%d\n", hd.width);
   /*
-  render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
-  render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
-  render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
-  render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+     render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
+     render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
+     render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
+     render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
 
-  renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
-  render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-  render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
-  render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-  render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+     renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
+     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+     render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
+     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+     render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
 
-  render(imageTL(), "image", PROFILE_VORBIS_VP8_WEBM);
-  */
+     render(imageTL(), "image", PROFILE_VORBIS_VP8_WEBM);
+   */
 
   /*
      play(hdTL());
@@ -450,5 +449,5 @@ main (int argc, char** argv)
      play(effectTL());
      play(minuteTL());
    */
-   return 0;
+  return 0;
 }
