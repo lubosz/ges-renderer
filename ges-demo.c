@@ -1,3 +1,10 @@
+/*
+
+  Author: Lubosz Sarnecki
+  2013
+
+*/
+
 #include "ges-demo.h"
 
 #include <stdlib.h>
@@ -199,7 +206,7 @@ transitionTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
-  GESClip *srca, *srcb;
+  GESTestClip *srca, *srcb;
 
   timeline = ges_timeline_new_audio_video ();
 
@@ -208,8 +215,8 @@ transitionTL (void)
 
   ges_timeline_add_layer (timeline, layer);
 
-  srca = GES_CLIP (ges_test_clip_new ());
-  srcb = GES_CLIP (ges_test_clip_new ());
+  srca = ges_test_clip_new ();
+  srcb = ges_test_clip_new ();
 
   g_object_set (srca,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
@@ -217,10 +224,14 @@ transitionTL (void)
 
   g_object_set (srcb,
       "vpattern", GES_VIDEO_TEST_PATTERN_CIRCULAR,
-      "duration", 5 * GST_SECOND, "start", 2 * GST_SECOND, NULL);
+      "duration", 5 * GST_SECOND, 
+      "start", 2 * GST_SECOND, 
+      NULL);
+      
+  ges_test_clip_set_frequency (srcb, 800);
 
-  ges_layer_add_clip (layer, srca);
-  ges_layer_add_clip (layer, srcb);
+  ges_layer_add_clip (layer, GES_CLIP (srca));
+  ges_layer_add_clip (layer, GES_CLIP (srcb));
 
   /*
      tr = ges_transition_clip_new_for_nick ("crossfade");
@@ -250,7 +261,7 @@ effectTL (void)
   ges_timeline_add_layer (timeline, layer);
 
   clip1 = placeAsset (layer, path ("sd/trailer_400p.ogg"), 0, 0, 10);
-  clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 10, 5, 10);
+  clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.ogv"), 10, 5, 10);
 
   effect1 = ges_effect_new ("agingtv");
   ges_container_add (GES_CONTAINER (clip1), GES_TIMELINE_ELEMENT (effect1));
@@ -413,6 +424,10 @@ main (int argc, char** argv)
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
   g_print ("data path: %s\n", dataPath);
   
+  play(transitionTL());
+  
+  g_print("%d\n", hd.width);
+  /*
   render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
   render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
   render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
@@ -425,6 +440,7 @@ main (int argc, char** argv)
   render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
 
   render(imageTL(), "image", PROFILE_VORBIS_VP8_WEBM);
+  */
 
   /*
      play(hdTL());

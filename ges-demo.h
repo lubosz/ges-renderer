@@ -1,3 +1,10 @@
+/*
+
+  Author: Lubosz Sarnecki
+  2013
+
+*/
+
 #ifndef GESDEMO_H
 #define GESDEMO_H
 
