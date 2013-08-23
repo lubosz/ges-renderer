@@ -44,7 +44,6 @@ else()
 endif()
 
 add_executable(ges-demo ges-demo.c)
-add_executable(ges-minimal ges-minimal.c)
 
 set(LIBS gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0)
 
