@@ -66,4 +66,5 @@ else()
   )
 endif()
 
+include(GNUInstallDirs)
 install(FILES ${INSTALL_BINARIES} DESTINATION "${CMAKE_INSTALL_BINDIR}" ${BINPERMISSIONS})
