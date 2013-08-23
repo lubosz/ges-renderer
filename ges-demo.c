@@ -10,7 +10,6 @@
 #include <stdlib.h>
 
 static VideoSize pal = { 720, 576, 25 };
-static VideoSize hd = { 1280, 720, 30 };
 
 char *
 path (const char *filenName)
@@ -244,7 +243,7 @@ transitionTL (void)
      NULL);
      ges_layer_add_clip (layer1, GES_CLIP (tr));
    */
-  ges_timeline_commit (timeline);
+  //ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -271,7 +270,7 @@ effectTL (void)
   effect2 = ges_effect_new ("rippletv");
   ges_container_add (GES_CONTAINER (clip2), GES_TIMELINE_ELEMENT (effect2));
 
-  ges_timeline_commit (timeline);
+  //ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -296,7 +295,7 @@ testTL (void)
 
   ges_layer_add_clip (layer, src);
 
-  ges_timeline_commit (timeline);
+  //ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -320,7 +319,7 @@ minuteTL (void)
   placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 30, 4, 15);
   placeAsset (layer, path ("sd/Mandelbox.mp4"), 45, 0, 15);
 
-  ges_timeline_commit (timeline);
+  //ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -343,7 +342,7 @@ imageTL (void)
       4, 0, 2);
   placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 6, 0, 2);
 
-  ges_timeline_commit (timeline);
+  //ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -362,7 +361,7 @@ hdTL (void)
   placeAsset (layer, path ("hd/BlenderFluid.webm"), 0, 4, 5);
   placeAsset (layer, path ("hd/fluidsimulation.mp4"), 5, 7, 5);
 
-  ges_timeline_commit (timeline);
+  //ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -421,25 +420,23 @@ main (int argc, char **argv)
   getcwd (directory, 1024);
 
   dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
+  //dataPath = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
   g_print ("data path: %s\n", dataPath);
 
-  play (transitionTL ());
+  render (testTL (), "formats", PROFILE_VORBIS_VP8_WEBM);
+  render (testTL (), "formats", PROFILE_VORBIS_THEORA_OGG);
+  render (testTL (), "formats", PROFILE_AAC_H264_QUICKTIME);
+  render (testTL (), "formats", PROFILE_VORBIS_H264_MATROSKA);
 
-  g_print ("%d\n", hd.width);
-  /*
-     render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
-     render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
-     render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
-     render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+  render (effectTL (), "effect", PROFILE_AAC_H264_QUICKTIME);
+  render (minuteTL (), "1minute", PROFILE_AAC_H264_QUICKTIME);
+  render (transitionTL (), "transition", PROFILE_AAC_H264_QUICKTIME);
+  render (musicTL (), "audio", PROFILE_AAC_H264_QUICKTIME);
 
-     renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
-     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-     render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
-     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-     render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+  render (imageTL (), "image", PROFILE_VORBIS_VP8_WEBM);
 
-     render(imageTL(), "image", PROFILE_VORBIS_VP8_WEBM);
-   */
+  VideoSize hd = { 1280, 720, 30 };
+  renderWithSize (hdTL (), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
 
   /*
      play(hdTL());
