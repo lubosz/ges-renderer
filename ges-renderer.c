@@ -8,10 +8,13 @@
 #include "ges-renderer.h"
 
 #include <stdlib.h>
-#include <gst/pbutils/encoding-profile.h>
-#include <gst/pbutils/encoding-target.h>
+
+static gchar *dataPath;
+static GESPipeline *pipeline = NULL;
+static GstClockTime duration;
 
 void setPath(gchar * path) {
+    duration = 0;
     dataPath = path;
     g_print ("data path: %s\n", dataPath);
 }
@@ -193,6 +196,7 @@ play (GESTimeline * timeline)
 void
 render (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
 {
+  VideoSize pal = { 720, 576, 25 };
   renderWithSize (timeline, name, prof, &pal);
 }
 
@@ -220,11 +224,9 @@ void printTarget(GstEncodingTarget *target) {
 	g_print ("target: %s\n%s\n%s\n\n", name, cat, desc);
 }
 
-void listProfiles() {
-
-	GstEncodingProfile *prof;
+void listProfiles(void) {
 	GList *categories, *tmpc;
-	GList *targets, *tmpt;       
+    GList * targets;
 
 	categories = gst_encoding_list_available_categories();
 	g_print("bar\n");

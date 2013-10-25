@@ -12,7 +12,8 @@
 #include <stdio.h>
 #include <gst/gst.h>
 #include <ges/ges.h>
-
+#include <gst/pbutils/encoding-profile.h>
+#include <gst/pbutils/encoding-target.h>
 
 static const char *const profiles[][4] = {
   {"application/ogg", "audio/x-vorbis", "video/x-theora", "ogv"},
@@ -37,10 +38,8 @@ struct VideoSize
   gint height;
   gint fps;
 };
-static VideoSize pal = { 720, 576, 25 };
-static VideoSize hd = { 1280, 720, 30 };
 
-static gchar *dataPath;
+//const VideoSize hd = { 1280, 720, 30 };
 
 void setPath(gchar * path);
 
@@ -69,8 +68,7 @@ void render (GESTimeline * timeline, const gchar * name, EncodingProfile prof);
 void renderWithSize (GESTimeline * timeline, const gchar * name,
     EncodingProfile prof, VideoSize * size);
 
-
-static GESPipeline *pipeline = NULL;
-static GstClockTime duration;
+void printTarget(GstEncodingTarget *target);
+void listProfiles(void);
 
 #endif // GES_RENDERER_H

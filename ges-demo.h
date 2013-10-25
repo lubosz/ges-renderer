@@ -21,5 +21,6 @@ GESTimeline *imageTL (void);
 GESTimeline *oneTL (void);
 GESTimeline *musicTL (void);
 GESTimeline *hdTL (void);
+GESTimeline * sameResImageTL (void);
 
 #endif // GESDEMO_H

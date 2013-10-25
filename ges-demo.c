@@ -240,9 +240,6 @@ musicTL (void)
 int
 main (int argc, char **argv)
 {
-
-    duration = 0;
-
   gst_init (NULL, NULL);
   ges_init ();
 
