@@ -168,8 +168,8 @@ imageTL (void)
   ges_timeline_add_layer (timeline, layer);
 
   placeAsset (layer, path ("images/LAMP_720_576.jpg"), 0, 0, 2);
-  placeAsset (layer, path ("images/Fish.png"), 2, 0, 2);
-  placeAsset (layer, path ("images/PNG_transparency_demonstration_1.png"),
+  placeAsset (layer, path ("images/wallpaper-2597248.jpg"), 2, 0, 2);
+  placeAsset (layer, path ("images/gradient1920x1080.jpg"),
       4, 0, 2);
   placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 6, 0, 2);
 
@@ -179,7 +179,7 @@ imageTL (void)
 }
 
 GESTimeline *
-sameResImageTL (void)
+pngTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -190,8 +190,11 @@ sameResImageTL (void)
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("images/test1.jpg"), 0, 0, 10);
-  placeAsset (layer, path ("images/test2.jpg"), 10, 0, 10);
+  placeAsset (layer, path ("images/test1.png"), 0, 0, 2);
+  placeAsset (layer, path ("images/test2.png"), 2, 0, 2);
+  placeAsset (layer, path ("images/Fish.png"), 4, 0, 2);
+  placeAsset (layer, path ("images/PNG_transparency_demonstration_1.png"),
+      6, 0, 2);
 
   ges_timeline_commit (timeline);
 
@@ -282,11 +285,12 @@ void renderTests(void) {
     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
     render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
 
-    render(sameResImageTL(), "sameres", PROFILE_AAC_H264_QUICKTIME);
+    render(pngTL(), "image-png", PROFILE_AAC_H264_QUICKTIME);
 
     VideoSize hd = { 1280, 720, 30 };
     renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
     render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+    render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
 }
 
 void brokenRenderTests(void) {
