@@ -260,6 +260,41 @@ musicTL (void)
   return timeline;
 }
 
+void playTests(void) {
+    play(hdTL());
+    play(musicTL());
+    play(testTL());
+    play(transitionTL());
+    play(effectTL());
+    play(minuteTL());
+}
+
+void renderTests(void) {
+    render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
+    render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
+    render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
+    render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+
+    render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+    render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
+
+    render(sameResImageTL(), "sameres", PROFILE_AAC_H264_QUICKTIME);
+
+    VideoSize hd = { 1280, 720, 30 };
+    renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
+    render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+}
+
+void brokenRenderTests(void) {
+    // muxer resolution problem
+    render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
+    render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
+
+    // muxer negotiation problem
+    render(testPatternTL(), "testpattern", PROFILE_AAC_H264_QUICKTIME);
+    render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+}
+
 int
 main (int argc, char **argv)
 {
@@ -275,35 +310,7 @@ main (int argc, char **argv)
 #endif
   setPath(path);
 
-  render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
-  render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
-  render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
-  render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+  renderTests();
 
-  render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-  render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
-
-  render(sameResImageTL(), "sameres", PROFILE_AAC_H264_QUICKTIME);
-
-  VideoSize hd = { 1280, 720, 30 };
-  renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
-  render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
-
-  //broken
-  //render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
-  //render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
-  //broken
-  //render(testPatternTL(), "testpattern", PROFILE_AAC_H264_QUICKTIME);
-  //broken
-  //render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-
-  /*
-     play(hdTL());
-     play(musicTL());
-     play(testTL());
-     play(transitionTL());
-     play(effectTL());
-     play(minuteTL());
-   */
   return 0;
 }

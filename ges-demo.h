@@ -24,4 +24,8 @@ GESTimeline *hdTL (void);
 GESTimeline * sameResImageTL (void);
 GESTimeline * transitionTL (void);
 
+void playTests(void);
+void renderTests(void);
+void brokenRenderTests(void);
+
 #endif // GESDEMO_H
