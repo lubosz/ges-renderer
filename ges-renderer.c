@@ -125,6 +125,8 @@ durationQuerier (void)
 
   float percent = (float) position * 100 / (float) duration;
 
+  //TODO: error when pos > dur
+
   float positionSec = (float) position / GST_SECOND;
   float durationSec = (float) duration / GST_SECOND;
 
