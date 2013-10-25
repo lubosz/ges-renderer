@@ -269,12 +269,14 @@ void playTests(void) {
     play(minuteTL());
 }
 
-void renderTests(void) {
+void formatTests(void) {
     render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
     render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
     render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
     render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+}
 
+void renderTests(void) {
     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
     render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
 
@@ -295,17 +297,31 @@ void brokenRenderTests(void) {
     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 }
 
+
+char *replace(char *s, char old, char replacement) {
+    char *p = s;
+
+    while(*p) {
+        if(*p == old)
+            *p = replacement;
+        ++p;
+    }
+    return s;
+}
+
 int
 main (int argc, char **argv)
 {
   gst_init (&argc, &argv);
   ges_init ();
 
-#ifdef PLATTFORM_WINDOWS
-  gchar * path = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
-#else
   char directory[1024];
   getcwd (directory, 1024);
+#ifdef PLATTFORM_WINDOWS
+  char * replaced = replace (directory, '\\', '/');
+  g_print("directory %s/data/\n", replaced);
+  gchar * path = g_strconcat ("file:///", replaced, "/data/", NULL);
+#else
   gchar * path = g_strconcat ("file://", &directory, "/data/", NULL);
 #endif
   setPath(path);

@@ -25,7 +25,10 @@ GESTimeline * sameResImageTL (void);
 GESTimeline * transitionTL (void);
 
 void playTests(void);
+void formatTests(void);
 void renderTests(void);
 void brokenRenderTests(void);
+
+char *replace(char *s, char old, char replacement);
 
 #endif // GESDEMO_H
