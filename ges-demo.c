@@ -294,12 +294,10 @@ void renderTests(void) {
 }
 
 void brokenRenderTests(void) {
-    // muxer resolution problem
-    render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
-    render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
 
-    // muxer negotiation problem
+    //does not stop
     render(testPatternTL(), "testpattern", PROFILE_AAC_H264_QUICKTIME);
+    // muxer negotiation problem
     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 }
 
@@ -330,7 +328,9 @@ main (int argc, char **argv)
 #endif
   setPath(path);
 
+  formatTests();
   renderTests();
+  //brokenRenderTests();
 
   return 0;
 }

@@ -148,9 +148,6 @@ void
 renderPipeline (GESPipeline * pipeline, EncodingProfile prof,
     const gchar * name, VideoSize * size)
 {
-    g_print ("data path %s\n", dataPath);
-    g_print ("name %s\n", name);
-
   gchar *fileName =
       g_strconcat (dataPath, "export/", name, ".", profiles[prof][3], NULL);
   g_print ("Rendering %s\n", fileName);
