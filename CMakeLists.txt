@@ -41,11 +41,12 @@ else()
   include_directories(
     /usr/include/gstreamer-1.0
     /usr/include/glib-2.0
-    /usr/lib/glib-2.0/include/
+    /usr/lib/glib-2.0/include
+    /usr/include/json-glib-1.0
   )
 endif()
 
-add_executable(ges-demo ges-demo.c)
+add_executable(ges-demo ges-demo.c ges-renderer.c)
 add_executable(ges-minimal ges-minimal.c)
 add_executable(ges-json ges-json.c)
 
@@ -75,7 +76,7 @@ else()
   set (INSTALL_BINARIES
 	  ${CMAKE_SOURCE_DIR}/ges-demo
 	  ${CMAKE_SOURCE_DIR}/ges-minimal
-	    ${CMAKE_SOURCE_DIR}/ges-json
+	  ${CMAKE_SOURCE_DIR}/ges-json
   )
 endif()
 
