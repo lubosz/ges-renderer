@@ -419,8 +419,9 @@ main (int argc, char **argv)
   char directory[1024];
   getcwd (directory, 1024);
 
-  dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
-  //dataPath = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
+  //dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
+  dataPath = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
+
   g_print ("data path: %s\n", dataPath);
 
   render (testTL (), "formats", PROFILE_VORBIS_VP8_WEBM);
