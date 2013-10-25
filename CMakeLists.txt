@@ -28,34 +28,26 @@ if( NOT WIN32 )
   add_cflag("-Wnested-externs")
 endif()
 
-set(WIN_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
-
-if( WIN32 )
-  include_directories(
-    ${WIN_PREFIX}/include/gstreamer-1.0
-    ${WIN_PREFIX}/include/glib-2.0
-    ${WIN_PREFIX}/lib/glib-2.0/include
-    ${WIN_PREFIX}/include/json-glib-1.0
-  )
-else()
-  include_directories(
-    /usr/include/gstreamer-1.0
-    /usr/include/glib-2.0
-    /usr/lib/glib-2.0/include
-    /usr/include/json-glib-1.0
-  )
-endif()
-
-add_executable(ges-demo ges-demo.c ges-renderer.c)
-add_executable(ges-minimal ges-minimal.c)
-add_executable(ges-json ges-json.c)
-
 set(LIBS gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0)
 
 if( WIN32 )
   add_definitions( -DPLATTFORM_WINDOWS )
   set (LIBS ${LIBS} Kernel32.dll)
+  set(OS_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
+else()
+  set(OS_PREFIX /usr)
 endif()
+
+include_directories(
+  ${OS_PREFIX}/include/gstreamer-1.0
+  ${OS_PREFIX}/include/glib-2.0
+  ${OS_PREFIX}/lib/glib-2.0/include
+  ${OS_PREFIX}/include/json-glib-1.0
+)
+
+add_executable(ges-demo ges-demo.c ges-renderer.c)
+add_executable(ges-minimal ges-minimal.c)
+add_executable(ges-json ges-json.c)
 
 target_link_libraries(ges-demo ${LIBS})
 target_link_libraries(ges-minimal ${LIBS})
@@ -81,5 +73,4 @@ else()
   )
 endif()
 
-install(FILES ${INSTALL_BINARIES} DESTINATION "${WIN_PREFIX}/bin" ${BINPERMISSIONS})
-
+install(FILES ${INSTALL_BINARIES} DESTINATION "${OS_PREFIX}/bin" ${BINPERMISSIONS})
