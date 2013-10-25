@@ -28,8 +28,9 @@ if( NOT WIN32 )
   add_cflag("-Wnested-externs")
 endif()
 
+set(WIN_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
+
 if( WIN32 )
-  set(WIN_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86/)
   include_directories(
     ${WIN_PREFIX}/include/gstreamer-1.0
     ${WIN_PREFIX}/include/glib-2.0
@@ -55,16 +56,17 @@ set(BINPERMISSIONS PERMISSIONS
 	GROUP_READ GROUP_EXECUTE
 	WORLD_READ WORLD_EXECUTE)
 
-
 if( WIN32 )
   set (INSTALL_BINARIES
 	  ${CMAKE_SOURCE_DIR}/ges-demo.exe
+	  ${CMAKE_SOURCE_DIR}/ges-minimal.exe
   )
 else()
   set (INSTALL_BINARIES
 	  ${CMAKE_SOURCE_DIR}/ges-demo
+	  ${CMAKE_SOURCE_DIR}/ges-minimal
   )
 endif()
 
-include(GNUInstallDirs)
-install(FILES ${INSTALL_BINARIES} DESTINATION "${CMAKE_INSTALL_BINDIR}" ${BINPERMISSIONS})
+install(FILES ${INSTALL_BINARIES} DESTINATION "${WIN_PREFIX}/bin" ${BINPERMISSIONS})
+
