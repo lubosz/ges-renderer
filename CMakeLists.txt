@@ -35,6 +35,7 @@ if( WIN32 )
     ${WIN_PREFIX}/include/gstreamer-1.0
     ${WIN_PREFIX}/include/glib-2.0
     ${WIN_PREFIX}/lib/glib-2.0/include
+    ${WIN_PREFIX}/include/json-glib-1.0
   )
 else()
   include_directories(
@@ -46,6 +47,7 @@ endif()
 
 add_executable(ges-demo ges-demo.c)
 add_executable(ges-minimal ges-minimal.c)
+add_executable(ges-json ges-json.c)
 
 set(LIBS gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0)
 
@@ -55,6 +57,7 @@ endif()
 
 target_link_libraries(ges-demo ${LIBS})
 target_link_libraries(ges-minimal ${LIBS})
+target_link_libraries(ges-json ${LIBS} json-glib-1.0)
 
 #install
 set(BINPERMISSIONS PERMISSIONS
@@ -66,11 +69,13 @@ if( WIN32 )
   set (INSTALL_BINARIES
 	  ${CMAKE_SOURCE_DIR}/ges-demo.exe
 	  ${CMAKE_SOURCE_DIR}/ges-minimal.exe
+	  ${CMAKE_SOURCE_DIR}/ges-json.exe
   )
 else()
   set (INSTALL_BINARIES
 	  ${CMAKE_SOURCE_DIR}/ges-demo
 	  ${CMAKE_SOURCE_DIR}/ges-minimal
+	    ${CMAKE_SOURCE_DIR}/ges-json
   )
 endif()
 
