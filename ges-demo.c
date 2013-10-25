@@ -10,7 +10,6 @@
 #include "ges-demo.h"
 #include "ges-renderer.h"
 
-
 GESTimeline *
 transitionTL (void)
 {
@@ -251,9 +250,15 @@ main (int argc, char **argv)
   getcwd (directory, 1024);
 
   //dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
-  dataPath = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
 
-  g_print ("data path: %s\n", dataPath);
+  gchar * path = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
+  setPath(path);
+
+  //play(testTL());
+  //render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
+  
+  //listProfiles();
+  render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
 
   /*
      render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
