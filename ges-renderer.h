@@ -42,6 +42,8 @@ static VideoSize hd = { 1280, 720, 30 };
 
 static gchar *dataPath;
 
+void setPath(gchar * path);
+
 char *path (const char *filenName);
 
 GESClip *placeAsset (GESLayer * layer, gchar * get_path, gint start, gint in,

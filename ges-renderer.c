@@ -11,6 +11,11 @@
 #include <gst/pbutils/encoding-profile.h>
 #include <gst/pbutils/encoding-target.h>
 
+void setPath(gchar * path) {
+    dataPath = path;
+    g_print ("data path: %s\n", dataPath);
+}
+
 char *
 path (const char *filenName)
 {
@@ -126,6 +131,9 @@ void
 renderPipeline (GESPipeline * pipeline, EncodingProfile prof,
     const gchar * name, VideoSize * size)
 {
+    g_print ("data path %s\n", dataPath);
+    g_print ("name %s\n", name);
+
   gchar *fileName =
       g_strconcat (dataPath, "export/", name, ".", profiles[prof][3], NULL);
   g_print ("Rendering %s\n", fileName);
