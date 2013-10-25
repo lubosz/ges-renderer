@@ -297,7 +297,6 @@ void brokenRenderTests(void) {
     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 }
 
-
 char *replace(char *s, char old, char replacement) {
     char *p = s;
 
@@ -319,7 +318,6 @@ main (int argc, char **argv)
   getcwd (directory, 1024);
 #ifdef PLATTFORM_WINDOWS
   char * replaced = replace (directory, '\\', '/');
-  g_print("directory %s/data/\n", replaced);
   gchar * path = g_strconcat ("file:///", replaced, "/data/", NULL);
 #else
   gchar * path = g_strconcat ("file://", &directory, "/data/", NULL);

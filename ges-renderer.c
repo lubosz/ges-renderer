@@ -17,7 +17,6 @@ static gboolean wasError = FALSE;
 void setPath(gchar * path) {
     duration = 0;
     dataPath = path;
-    g_print ("data path: %s\n", dataPath);
 }
 
 char *
