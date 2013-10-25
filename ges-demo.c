@@ -8,6 +8,8 @@
 #include "ges-demo.h"
 
 #include <stdlib.h>
+#include <gst/pbutils/encoding-profile.h>
+#include <gst/pbutils/encoding-target.h>
 
 static VideoSize pal = { 720, 576, 25 };
 
@@ -117,7 +119,7 @@ durationQuerier (void)
   float durationSec = (float) duration / GST_SECOND;
 
   if (position > 0)
-    g_print ("\r%.2f%% %.2f/%.2fs", percent, positionSec, durationSec);
+    g_print ("\r%.2f%% %.2f/%.2fs                                ", percent, positionSec, durationSec);
 
   return TRUE;
 }
@@ -348,6 +350,27 @@ imageTL (void)
 }
 
 GESTimeline *
+sameResImageTL (void)
+{
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video ();
+  layer = ges_layer_new ();
+  //g_object_set (layer, "auto-transition", TRUE, NULL);
+
+  ges_timeline_add_layer (timeline, layer);
+
+  placeAsset (layer, path ("images/test1.jpg"), 0, 0, 10);
+  placeAsset (layer, path ("images/test2.jpg"), 10, 0, 10);
+  //placeAsset (layer, path ("images/Fish.png"), 2, 0, 2);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+GESTimeline *
 hdTL (void)
 {
   GESTimeline *timeline;
@@ -410,9 +433,44 @@ musicTL (void)
   return timeline;
 }
 
+void printTarget(GstEncodingTarget *target) {
+	const gchar * name = gst_encoding_target_get_name(target);
+	const gchar * cat = gst_encoding_target_get_category(target);
+	const gchar * desc = gst_encoding_target_get_description(target);
+	
+	g_print ("target: %s\n%s\n%s\n\n", name, cat, desc);
+}
+
+void listProfiles() {
+
+	GstEncodingProfile *prof;
+	GList *categories, *tmpc;
+	GList *targets, *tmpt;       
+
+	categories = gst_encoding_list_available_categories();
+	g_print("bar\n");
+
+	for (tmpc = categories; tmpc; tmpc = tmpc->next) {
+	  g_print("foo\n");
+	  gchar *category = (gchar *) tmpc->data;
+
+	  targets = gst_encoding_list_all_targets (category);
+
+	  g_list_foreach (targets, (GFunc) printTarget, NULL);
+	  g_list_free (targets);
+	}
+
+	g_list_foreach (categories, (GFunc) g_free, NULL);
+	g_list_free (categories);
+
+}
+
 int
 main (int argc, char **argv)
 {
+
+    duration = 0;
+
   gst_init (NULL, NULL);
   ges_init ();
 
