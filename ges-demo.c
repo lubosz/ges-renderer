@@ -243,12 +243,13 @@ main (int argc, char **argv)
   gst_init (NULL, NULL);
   ges_init ();
 
+#ifdef PLATTFORM_WINDOWS
+  gchar * path = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
+#else
   char directory[1024];
   getcwd (directory, 1024);
-
-  //dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
-
-  gchar * path = g_strconcat ("file:///C:/Users/bmonkey/cerbero/dist/windows_x86/bin/data/", NULL);
+  gchar * path = g_strconcat ("file://", &directory, "/data/", NULL);
+#endif
   setPath(path);
 
   //play(testTL());
