@@ -1,1 +1,11 @@
 data
+*~
+CMakeCache.txt
+CMakeFiles
+CMakeLists.txt.user
+Makefile
+Project.cbp
+cmake_install.cmake
+ges-demo
+ges-json
+ges-minimal
