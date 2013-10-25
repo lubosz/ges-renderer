@@ -73,6 +73,18 @@ busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
   }
 }
 
+GstCaps * makeCaps(VideoSize * size) {
+    GstCaps *caps;
+    char capsstring[50];
+    sprintf (capsstring,
+        "video/x-raw,width=%d,height=%d,framerate=%d/1",
+        size->width, size->height, size->fps);
+
+    caps = gst_caps_from_string (capsstring);
+
+    return caps;
+}
+
 GstEncodingProfile *
 encoderProfile (EncodingProfile type, VideoSize * size)
 {
@@ -92,11 +104,8 @@ encoderProfile (EncodingProfile type, VideoSize * size)
 
   caps = gst_caps_from_string (profiles[type][2]);
 
-  char capsstring[50];
-  sprintf (capsstring, "video/x-raw,width=%d,height=%d,framerate=%d/1",
-      size->width, size->height, size->fps);
+  settings = makeCaps(size);
 
-  settings = gst_caps_from_string (capsstring);
   gst_encoding_container_profile_add_profile (prof,
       (GstEncodingProfile *) gst_encoding_video_profile_new (caps, NULL,
           settings, 0));
@@ -254,4 +263,32 @@ void listProfiles(void) {
 	g_list_foreach (categories, (GFunc) g_free, NULL);
 	g_list_free (categories);
 
+}
+
+GESTimeline * palTimeline(void) {
+    GESTimeline *timeline;
+    VideoSize pal = { 720, 576, 25 };
+    timeline = newTimeline(&pal);
+    return timeline;
+}
+
+GESTimeline * newTimeline(VideoSize * size) {
+    GESTimeline *timeline;
+    GESTrack *tracka, *trackv;
+    timeline = ges_timeline_new ();
+
+    tracka = GES_TRACK (ges_audio_track_new ());
+    trackv = GES_TRACK (ges_video_track_new ());
+
+    if (!ges_timeline_add_track (timeline, trackv) ||
+        !ges_timeline_add_track (timeline, tracka)) {
+      gst_object_unref (timeline);
+      timeline = NULL;
+    }
+
+    GstCaps * caps = makeCaps(size);
+
+    ges_track_set_restriction_caps(trackv, caps);
+
+    return timeline;
 }

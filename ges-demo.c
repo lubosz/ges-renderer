@@ -17,7 +17,7 @@ testPatternTL (void)
   GESLayer *layer;
   GESTestClip *srca, *srcb;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
 
   layer = ges_layer_new ();
   //g_object_set (layer, "auto-transition", TRUE, NULL);
@@ -64,7 +64,7 @@ effectTL (void)
   GESClip *clip1, *clip2;
   GESEffect *effect1, *effect2;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -89,7 +89,7 @@ transitionTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
   layer = ges_layer_new ();
 
   g_object_set (layer, "auto-transition", TRUE, NULL);
@@ -112,7 +112,7 @@ testTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -137,7 +137,7 @@ minuteTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -160,7 +160,8 @@ imageTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
+
   layer = ges_layer_new ();
   //g_object_set (layer, "auto-transition", TRUE, NULL);
 
@@ -183,7 +184,7 @@ sameResImageTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
   layer = ges_layer_new ();
   //g_object_set (layer, "auto-transition", TRUE, NULL);
 
@@ -203,7 +204,8 @@ hdTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  VideoSize hd = { 1280, 720, 30 };
+  timeline = newTimeline(&hd);
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -222,7 +224,7 @@ oneTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_audio_video ();
+  timeline = palTimeline();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);

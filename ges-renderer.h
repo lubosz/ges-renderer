@@ -69,4 +69,9 @@ void renderWithSize (GESTimeline * timeline, const gchar * name,
 void printTarget(GstEncodingTarget *target);
 void listProfiles(void);
 
+GstCaps * makeCaps(VideoSize *size);
+
+GESTimeline * palTimeline(void);
+GESTimeline * newTimeline(VideoSize * size);
+
 #endif // GES_RENDERER_H
