@@ -53,6 +53,7 @@ add_executable(ges-json ges-json.c)
 set(LIBS gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0)
 
 if( WIN32 )
+  add_definitions( -DPLATTFORM_WINDOWS )
   set (LIBS ${LIBS} Kernel32.dll)
 endif()
 

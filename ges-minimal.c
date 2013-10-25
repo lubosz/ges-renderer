@@ -1,11 +1,14 @@
+#ifdef PLATTFORM_WINDOWS
 #include <windows.h>
+#endif
 #include <ges/ges.h>
 
 int
 main (int argc, char **argv)
 {
+#ifdef PLATTFORM_WINDOWS
     LoadLibrary("exchndl.dll");
-
+#endif
 
   GESTimeline *timeline;
   GESLayer *layer;

@@ -1,7 +1,13 @@
+
+#ifdef PLATTFORM_WINDOWS
 #include <windows.h>
+#endif
+
+#include <stdlib.h>
+
+#include "ges-json.h"
+
 #include <ges/ges.h>
-#include <glib-object.h>
-#include <json-glib/json-glib.h>
 
 /*
 int
@@ -80,7 +86,9 @@ void getAssets(JsonReader *reader, const gchar *member_name) {
 }
 
 int main (int argc, char *argv[]) {
+#ifdef PLATTFORM_WINDOWS
   LoadLibrary("exchndl.dll");
+#endif
   JsonParser *parser;
   JsonNode *root;
   GError *error;
