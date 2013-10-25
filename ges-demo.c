@@ -11,7 +11,7 @@
 #include "ges-renderer.h"
 
 GESTimeline *
-transitionTL (void)
+testPatternTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -20,21 +20,23 @@ transitionTL (void)
   timeline = ges_timeline_new_audio_video ();
 
   layer = ges_layer_new ();
-  g_object_set (layer, "auto-transition", TRUE, NULL);
+  //g_object_set (layer, "auto-transition", TRUE, NULL);
 
   ges_timeline_add_layer (timeline, layer);
 
   srca = ges_test_clip_new ();
   srcb = ges_test_clip_new ();
 
+  // no gst second in duration!
   g_object_set (srca,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
-      "duration", 5 * GST_SECOND, NULL);
+      "duration", 5,
+      "start", 0, NULL);
 
   g_object_set (srcb,
       "vpattern", GES_VIDEO_TEST_PATTERN_CIRCULAR,
-      "duration", 5 * GST_SECOND, "start", 2 * GST_SECOND, NULL);
-
+      "duration", 5,
+      "start", 5, NULL);
   ges_test_clip_set_frequency (srcb, 800);
 
   ges_layer_add_clip (layer, GES_CLIP (srca));
@@ -81,6 +83,28 @@ effectTL (void)
   return timeline;
 }
 
+GESTimeline *
+transitionTL (void)
+{
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_audio_video ();
+  layer = ges_layer_new ();
+
+  g_object_set (layer, "auto-transition", TRUE, NULL);
+
+  ges_timeline_add_layer (timeline, layer);
+
+  // "sd/sintel_trailer-480p.ogv" makes warnings!
+
+  placeAsset (layer, path ("sd/3D fractal.webm"), 0, 0, 10);
+  placeAsset (layer, path ("sd/trailer_400p.ogg"), 7, 5, 10);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
 
 GESTimeline *
 testTL (void)
@@ -123,7 +147,7 @@ minuteTL (void)
       0, 0, 15);
   placeAsset (layer, path ("sd/trailer_400p.ogg"), 15, 2, 15);
   placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 30, 4, 15);
-  placeAsset (layer, path ("sd/Mandelbox.mp4"), 45, 0, 15);
+  placeAsset (layer, path ("hd/fluidsimulation.mp4"), 45, 0, 15);
 
   ges_timeline_commit (timeline);
 
@@ -224,11 +248,11 @@ musicTL (void)
   ges_timeline_add_layer (timeline, audiolayer1);
   ges_timeline_add_layer (timeline, audiolayer2);
 
-  placeAssetType (layer, path ("sd/Mandelbox.mp4"), 0, 20, 10,
+  placeAssetType (layer, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
       GES_TRACK_TYPE_VIDEO);
   placeAssetType (audiolayer1, path ("audio/prof.ogg"), 0, 0, 10,
       GES_TRACK_TYPE_AUDIO);
-  placeAssetType (audiolayer2, path ("audio/vask.wav"), 3, 0, 7,
+  placeAssetType (audiolayer2, path ("audio/vask.wav"), 2, 0, 7,
       GES_TRACK_TYPE_AUDIO);
 
   ges_timeline_commit (timeline);
@@ -256,23 +280,22 @@ main (int argc, char **argv)
   render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
   render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
 
-  //foo
-  // ogg demux problem with patch
   render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
   render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
 
-  // crashes with patch
-  render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-
-  render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
-
-  // qt mux refuses nagotiate new reses
-  render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
-  //render(sameResImageTL(), "sameRes", PROFILE_AAC_H264_QUICKTIME);
-  //render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
+  render(sameResImageTL(), "sameres", PROFILE_AAC_H264_QUICKTIME);
 
   VideoSize hd = { 1280, 720, 30 };
   renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
+  render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+
+  //broken
+  //render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
+  //render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
+  //broken
+  //render(testPatternTL(), "testpattern", PROFILE_AAC_H264_QUICKTIME);
+  //broken
+  //render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 
   /*
      play(hdTL());

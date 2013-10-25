@@ -12,6 +12,7 @@
 static gchar *dataPath;
 static GESPipeline *pipeline = NULL;
 static GstClockTime duration;
+static gboolean wasError = FALSE;
 
 void setPath(gchar * path) {
     duration = 0;
@@ -49,15 +50,18 @@ busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
 {
   switch (GST_MESSAGE_TYPE (message)) {
     case GST_MESSAGE_ERROR:{
+      //TODO: Log error message to file
+      wasError = TRUE;
       GError *err = NULL;
       gchar *dbg_info = NULL;
 
       gst_message_parse_error (message, &err, &dbg_info);
-      g_printerr ("ERROR from element %s: %s\n", GST_OBJECT_NAME (message->src),
+      g_printerr ("\n\nERROR from element %s: %s\n", GST_OBJECT_NAME (message->src),
           err->message);
       g_printerr ("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
       g_error_free (err);
       g_free (dbg_info);
+      g_main_loop_quit (mainloop);
       break;
     }
     case GST_MESSAGE_EOS:{
@@ -212,7 +216,12 @@ renderWithSize (GESTimeline * timeline, const gchar * name,
   float then = (float) g_get_monotonic_time () / (float) GST_MSECOND;
   float dur = then - now;
   g_print ("\n====\n");
-  g_print ("Rendering took %.2fs\n", dur);
+
+  const gchar * exitStatus = "Rendering";
+  if (wasError)
+      exitStatus = "Error";
+
+  g_print ("%s took %.2fs\n", exitStatus, dur);
   g_print ("====\n");
 }
 

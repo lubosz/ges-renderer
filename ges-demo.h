@@ -13,7 +13,7 @@
 #include <gst/gst.h>
 #include <ges/ges.h>
 
-GESTimeline *transitionTL (void);
+GESTimeline *testPatternTL (void);
 GESTimeline *effectTL (void);
 GESTimeline *testTL (void);
 GESTimeline *minuteTL (void);
@@ -22,5 +22,6 @@ GESTimeline *oneTL (void);
 GESTimeline *musicTL (void);
 GESTimeline *hdTL (void);
 GESTimeline * sameResImageTL (void);
+GESTimeline * transitionTL (void);
 
 #endif // GESDEMO_H
