@@ -39,8 +39,6 @@ struct VideoSize
   gint fps;
 };
 
-//const VideoSize hd = { 1280, 720, 30 };
-
 void setPath(gchar * path);
 
 char *path (const char *filenName);

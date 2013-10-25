@@ -49,7 +49,7 @@ transitionTL (void)
      NULL);
      ges_layer_add_clip (layer1, GES_CLIP (tr));
    */
-  //ges_timeline_commit (timeline);
+  ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -76,7 +76,7 @@ effectTL (void)
   effect2 = ges_effect_new ("rippletv");
   ges_container_add (GES_CONTAINER (clip2), GES_TIMELINE_ELEMENT (effect2));
 
-  //ges_timeline_commit (timeline);
+  ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -101,7 +101,7 @@ testTL (void)
 
   ges_layer_add_clip (layer, src);
 
-  //ges_timeline_commit (timeline);
+  ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -125,7 +125,7 @@ minuteTL (void)
   placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 30, 4, 15);
   placeAsset (layer, path ("sd/Mandelbox.mp4"), 45, 0, 15);
 
-  //ges_timeline_commit (timeline);
+  ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -148,7 +148,7 @@ imageTL (void)
       4, 0, 2);
   placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 6, 0, 2);
 
-  //ges_timeline_commit (timeline);
+  ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -167,7 +167,6 @@ sameResImageTL (void)
 
   placeAsset (layer, path ("images/test1.jpg"), 0, 0, 10);
   placeAsset (layer, path ("images/test2.jpg"), 10, 0, 10);
-  //placeAsset (layer, path ("images/Fish.png"), 2, 0, 2);
 
   ges_timeline_commit (timeline);
 
@@ -188,7 +187,7 @@ hdTL (void)
   placeAsset (layer, path ("hd/BlenderFluid.webm"), 0, 4, 5);
   placeAsset (layer, path ("hd/fluidsimulation.mp4"), 5, 7, 5);
 
-  //ges_timeline_commit (timeline);
+  ges_timeline_commit (timeline);
 
   return timeline;
 }
@@ -252,42 +251,28 @@ main (int argc, char **argv)
 #endif
   setPath(path);
 
-  //play(testTL());
-  //render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
-  
-  //listProfiles();
+  render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
+  render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
   render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
+  render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
 
-  /*
-     render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
-     render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
-     render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
-     render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+  //foo
+  // ogg demux problem with patch
+  render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+  render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
 
-     //foo
-     // ogg demux problem with patch
-     //render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-     //render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
+  // crashes with patch
+  render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 
+  render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
 
-     // crashes with patch
-     //render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+  // qt mux refuses nagotiate new reses
+  render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
+  //render(sameResImageTL(), "sameRes", PROFILE_AAC_H264_QUICKTIME);
+  //render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
 
-     render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
-
-     // qt mux refuses nagotiate new reses
-     //render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
-     render(imageTL(), "image", PROFILE_VORBIS_H264_MATROSKA);
-     render(sameResImageTL(), "sameRes", PROFILE_AAC_H264_QUICKTIME);
-
-     renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
-     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-     render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
-     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-     render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
-
-     render(imageTL(), "image", PROFILE_VORBIS_VP8_WEBM);
-   */
+  VideoSize hd = { 1280, 720, 30 };
+  renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
 
   /*
      play(hdTL());
