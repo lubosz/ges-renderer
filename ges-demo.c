@@ -298,7 +298,7 @@ void brokenRenderTests(void) {
 int
 main (int argc, char **argv)
 {
-  gst_init (NULL, NULL);
+  gst_init (&argc, &argv);
   ges_init ();
 
 #ifdef PLATTFORM_WINDOWS
