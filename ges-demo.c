@@ -318,15 +318,7 @@ main (int argc, char **argv)
   gst_init (&argc, &argv);
   ges_init ();
 
-  char directory[1024];
-  getcwd (directory, 1024);
-#ifdef PLATTFORM_WINDOWS
-  char * replaced = replace (directory, '\\', '/');
-  gchar * path = g_strconcat ("file:///", replaced, "/data/", NULL);
-#else
-  gchar * path = g_strconcat ("file://", &directory, "/data/", NULL);
-#endif
-  setPath(path);
+  init_path();
 
   formatTests();
   renderTests();

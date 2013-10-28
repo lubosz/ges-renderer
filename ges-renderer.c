@@ -19,6 +19,18 @@ void setPath(gchar * path) {
     dataPath = path;
 }
 
+void init_path(void) {
+    char directory[1024];
+    getcwd (directory, 1024);
+  #ifdef PLATTFORM_WINDOWS
+    char * replaced = replace (directory, '\\', '/');
+    gchar * path = g_strconcat ("file:///", replaced, "/data/", NULL);
+  #else
+    gchar * path = g_strconcat ("file://", &directory, "/data/", NULL);
+  #endif
+    setPath(path);
+}
+
 char *
 path (const char *filenName)
 {

@@ -4,49 +4,11 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "ges-json.h"
-
-#include <ges/ges.h>
-
-/*
-int
-main (int argc, char **argv)
-{
-    LoadLibrary("exchndl.dll");
-
-
-  GESTimeline *timeline;
-  GESLayer *layer;
-  GESPipeline *pipeline;
-
-  gst_init (&argc, &argv);
-  ges_init ();
-
-  timeline = ges_timeline_new_audio_video ();
-
-  layer = ges_layer_new ();
-  ges_timeline_add_layer (timeline, layer);
-
-  GESAsset *src_asset = ges_asset_request (GES_TYPE_TEST_CLIP, NULL, NULL);
-  ges_layer_add_asset (layer, src_asset, 0, 0, GST_SECOND, GES_TRACK_TYPE_UNKNOWN);
-
-  ges_timeline_commit (timeline);
-  
-  pipeline = ges_pipeline_new ();
-  ges_pipeline_add_timeline (pipeline, timeline);
-
-  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
-
-  GMainLoop *mainloop;
-  mainloop = g_main_loop_new (NULL, FALSE);
-
-  g_main_loop_run (mainloop);
-  g_main_loop_unref (mainloop);
-
-  return 0;
-}
-*/
+#include "ges-renderer.h"
 
 const gchar * getString(JsonReader *reader, const gchar *member_name) {
     json_reader_read_member (reader, member_name);
@@ -69,10 +31,19 @@ const gboolean getBool(JsonReader *reader, const gchar *member_name) {
     return value;
 }
 
-void getAssets(JsonReader *reader, const gchar *member_name) {
+void getAssets(JsonReader *reader, const gchar *member_name, GESTimeline * timeline, GESTrackType type) {
+
+    if (!is_in_members(reader, member_name))
+        return;
+
+    GESLayer *layer = ges_layer_new ();
+    ges_timeline_add_layer (timeline, layer);
+
     int i;
-    g_print("= %s clips =\n", member_name);
     json_reader_read_member (reader, member_name);
+
+    g_print("= %s clips =\n", member_name);
+
     for(i = 0; i < json_reader_count_elements(reader); i++) {
         json_reader_read_element (reader, i);
         const char *src = getString(reader, "src");
@@ -80,9 +51,87 @@ void getAssets(JsonReader *reader, const gchar *member_name) {
         int in = getInt(reader, "in");
         int dur = getInt(reader, "dur");
         g_print("Clip: %s (start: %d, in: %d, dur: %d)\n", src, start, in, dur);
+        placeAssetType (layer, path (src), start, in, dur, type);
         json_reader_end_element (reader);
     }
     json_reader_end_member (reader);
+}
+
+gboolean is_in_members(JsonReader *reader, const char* member) {
+    gchar ** members = json_reader_list_members(reader);
+    int member_size = json_reader_count_members(reader);
+
+    for (int i = 0; i < member_size; i++) {
+        if (strcmp(members[i], member) == 0) {
+            //g_print("found member: %s = %s\n", members[i], member);
+            return TRUE;
+        }
+
+    }
+    return FALSE;
+}
+
+void render_json(JsonNode *root) {
+    JsonReader *reader = json_reader_new (root);
+    GESTimeline * jsonTimeline;
+
+    json_reader_read_member (reader, "composition");
+
+    // comp strings
+    const char *name = getString(reader, "name");
+    gboolean autotransition = getBool(reader, "autotransition");
+    const char *src_dir = getString(reader, "src-dir");
+
+    g_print("Source Directory: %s\nName: %s\n", src_dir, name);
+
+    if (autotransition)
+        g_print("Auto Transitions on.\n");
+    //g_object_set (layer, "auto-transition", TRUE, NULL);
+
+    // comp ints
+    int width = getInt(reader, "width");
+    int height = getInt(reader, "height");
+    int fps = getInt(reader, "fps");
+
+    g_print("Resolution: %dx%d, FPS: %d\n", width, height, fps);
+
+    VideoSize res = { width, height, fps };
+    jsonTimeline = newTimeline(&res);
+
+    // videos
+    getAssets(reader, "video", jsonTimeline, GES_TRACK_TYPE_UNKNOWN);
+    getAssets(reader, "music", jsonTimeline, GES_TRACK_TYPE_AUDIO);
+    getAssets(reader, "image", jsonTimeline, GES_TRACK_TYPE_VIDEO);
+    getAssets(reader, "voice", jsonTimeline, GES_TRACK_TYPE_AUDIO);
+    getAssets(reader, "sound", jsonTimeline, GES_TRACK_TYPE_AUDIO);
+
+    ges_timeline_commit (jsonTimeline);
+
+    // formats
+    json_reader_read_member (reader, "formats");
+    int i;
+    for(i = 0; i < json_reader_count_elements(reader); i++) {
+        json_reader_read_element (reader, i);
+        const char *format = json_reader_get_string_value (reader);
+        json_reader_end_element (reader);
+        g_print("format: %s\n", format);
+        EncodingProfile prof = PROFILE_AAC_H264_QUICKTIME;
+        if (strcmp(format, "webm") == 0) {
+            prof = PROFILE_VORBIS_VP8_WEBM;
+        } else if (strcmp(format, "mkv") == 0){
+            prof = PROFILE_VORBIS_H264_MATROSKA;
+        } else if (strcmp(format, "mp4") == 0) {
+            prof = PROFILE_AAC_H264_QUICKTIME;
+        } else if (strcmp(format, "ogg") == 0) {
+            prof = PROFILE_VORBIS_THEORA_OGG;
+        }
+        renderWithSize(jsonTimeline, name, prof, &res);
+    }
+    json_reader_end_member (reader);
+
+    json_reader_end_member (reader);
+
+    g_object_unref (reader);
 }
 
 int main (int argc, char *argv[]) {
@@ -111,48 +160,14 @@ int main (int argc, char *argv[]) {
 
   root = json_parser_get_root (parser);
 
-  // manipulate the object tree and then exit
 
-  JsonReader *reader = json_reader_new (root);
+  gst_init (&argc, &argv);
+  ges_init ();
 
-  json_reader_read_member (reader, "composition");
+  init_path();
 
-  // comp strings
-  const char *name = getString(reader, "name");
-  gboolean autotransition = getBool(reader, "autotransition");
-  const char *src_dir = getString(reader, "src-dir");
+  render_json(root);
 
-  g_print("Source Directory: %s\nName: %s\n", src_dir, name);
-
-  if (autotransition)
-      g_print("Auto Transitions on.\n");
-
-  // comp ints
-  int width = getInt(reader, "width");
-  int height = getInt(reader, "height");
-  int fps = getInt(reader, "fps");
-
-  g_print("Resolution: %dx%d, FPS: %d\n", width, height, fps);
-
-  // formats
-  json_reader_read_member (reader, "formats");
-  int i;
-  for(i = 0; i < json_reader_count_elements(reader); i++) {
-      json_reader_read_element (reader, i);
-      const char *format = json_reader_get_string_value (reader);
-      json_reader_end_element (reader);
-      g_print("format: %s\n", format);
-  }
-  json_reader_end_member (reader);
-
-  // videos
-  getAssets(reader, "video");
-  getAssets(reader, "music");
-  getAssets(reader, "sound");
-  json_reader_end_member (reader);
-
-
-  g_object_unref (reader);
   g_object_unref (parser);
 
   return EXIT_SUCCESS;

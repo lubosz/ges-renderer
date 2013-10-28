@@ -47,7 +47,7 @@ include_directories(
 
 add_executable(ges-demo ges-demo.c ges-renderer.c)
 add_executable(ges-minimal ges-minimal.c)
-add_executable(ges-json ges-json.c)
+add_executable(ges-json ges-json.c ges-renderer.c)
 
 target_link_libraries(ges-demo ${LIBS})
 target_link_libraries(ges-minimal ${LIBS})
