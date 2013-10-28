@@ -31,12 +31,16 @@ const gboolean getBool(JsonReader *reader, const gchar *member_name) {
     return value;
 }
 
-void getAssets(JsonReader *reader, const gchar *member_name, GESTimeline * timeline, GESTrackType type) {
+void getAssets(JsonReader *reader, const gchar *member_name, GESTimeline * timeline, GESTrackType type, gboolean transitions) {
 
     if (!is_in_members(reader, member_name))
         return;
 
     GESLayer *layer = ges_layer_new ();
+
+    if (transitions)
+      g_object_set (layer, "auto-transition", TRUE, NULL);
+
     ges_timeline_add_layer (timeline, layer);
 
     int i;
@@ -86,7 +90,6 @@ void render_json(JsonNode *root) {
 
     if (autotransition)
         g_print("Auto Transitions on.\n");
-    //g_object_set (layer, "auto-transition", TRUE, NULL);
 
     // comp ints
     int width = getInt(reader, "width");
@@ -99,11 +102,11 @@ void render_json(JsonNode *root) {
     jsonTimeline = newTimeline(&res);
 
     // videos
-    getAssets(reader, "video", jsonTimeline, GES_TRACK_TYPE_UNKNOWN);
-    getAssets(reader, "music", jsonTimeline, GES_TRACK_TYPE_AUDIO);
-    getAssets(reader, "image", jsonTimeline, GES_TRACK_TYPE_VIDEO);
-    getAssets(reader, "voice", jsonTimeline, GES_TRACK_TYPE_AUDIO);
-    getAssets(reader, "sound", jsonTimeline, GES_TRACK_TYPE_AUDIO);
+    getAssets(reader, "video", jsonTimeline, GES_TRACK_TYPE_UNKNOWN, autotransition);
+    getAssets(reader, "music", jsonTimeline, GES_TRACK_TYPE_AUDIO, autotransition);
+    getAssets(reader, "image", jsonTimeline, GES_TRACK_TYPE_VIDEO, autotransition);
+    getAssets(reader, "voice", jsonTimeline, GES_TRACK_TYPE_AUDIO, autotransition);
+    getAssets(reader, "sound", jsonTimeline, GES_TRACK_TYPE_AUDIO, autotransition);
 
     ges_timeline_commit (jsonTimeline);
 
