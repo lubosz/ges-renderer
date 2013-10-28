@@ -55,7 +55,14 @@ void getAssets(JsonReader *reader, const gchar *member_name, GESTimeline * timel
         int in = getInt(reader, "in");
         int dur = getInt(reader, "dur");
         g_print("Clip: %s (start: %d, in: %d, dur: %d)\n", src, start, in, dur);
-        placeAssetType (layer, path (src), start, in, dur, type);
+        GESClip * clip = placeAssetType (layer, path (src), start, in, dur, type);
+
+        if (is_in_members(reader, "effect")) {
+            const char *effect_str = getString(reader, "effect");
+            GESEffect *effect = ges_effect_new (effect_str);
+            ges_container_add (GES_CONTAINER (clip), GES_TIMELINE_ELEMENT (effect));
+        }
+
         json_reader_end_element (reader);
     }
     json_reader_end_member (reader);
