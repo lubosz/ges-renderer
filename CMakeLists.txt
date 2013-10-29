@@ -48,10 +48,12 @@ include_directories(
 add_executable(ges-demo ges-demo.c ges-renderer.c)
 add_executable(ges-minimal ges-minimal.c)
 add_executable(ges-json ges-json.c ges-renderer.c)
+add_executable(ges-minimal-transition ges-minimal-transition.c)
 
 target_link_libraries(ges-demo ${LIBS})
 target_link_libraries(ges-minimal ${LIBS})
 target_link_libraries(ges-json ${LIBS} json-glib-1.0)
+target_link_libraries(ges-minimal-transition ${LIBS})
 
 #install
 set(BINPERMISSIONS PERMISSIONS
