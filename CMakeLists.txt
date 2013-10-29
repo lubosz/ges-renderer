@@ -15,8 +15,9 @@ else()
     add_cflag("-O3")
 endif()
 
+add_cflag("-std=c99")
+
 if( NOT WIN32 )
-  add_cflag("-std=c99")
   add_cflag("-Werror")
   add_cflag("-Wall")
   add_cflag("-Wuninitialized")
