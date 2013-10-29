@@ -59,6 +59,7 @@ void getAssets(JsonReader *reader, const gchar *member_name, GESTimeline * timel
 
         if (is_in_members(reader, "effect")) {
             const char *effect_str = getString(reader, "effect");
+            g_print("Using effect %s", effect_str);
             GESEffect *effect = ges_effect_new (effect_str);
             ges_container_add (GES_CONTAINER (clip), GES_TIMELINE_ELEMENT (effect));
         }
@@ -112,8 +113,8 @@ void render_json(JsonNode *root) {
     getAssets(reader, "video", jsonTimeline, GES_TRACK_TYPE_UNKNOWN, autotransition);
     getAssets(reader, "music", jsonTimeline, GES_TRACK_TYPE_AUDIO, autotransition);
     getAssets(reader, "image", jsonTimeline, GES_TRACK_TYPE_VIDEO, autotransition);
-    getAssets(reader, "voice", jsonTimeline, GES_TRACK_TYPE_AUDIO, autotransition);
-    getAssets(reader, "sound", jsonTimeline, GES_TRACK_TYPE_AUDIO, autotransition);
+    getAssets(reader, "voice", jsonTimeline, GES_TRACK_TYPE_AUDIO, FALSE);
+    getAssets(reader, "sound", jsonTimeline, GES_TRACK_TYPE_AUDIO, FALSE);
 
     ges_timeline_commit (jsonTimeline);
 
