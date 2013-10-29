@@ -48,6 +48,14 @@ main (int argc, char **argv)
 
   timeline = ges_timeline_new_audio_video ();
 
+  GESTrack *track;
+
+  timeline = ges_timeline_new ();
+
+  track = GES_TRACK (ges_video_track_new ());
+
+  ges_timeline_add_track (timeline, track);
+
   layer = ges_layer_new ();
   ges_timeline_add_layer (timeline, layer);
 
