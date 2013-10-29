@@ -7,6 +7,10 @@
 
 #include <stdlib.h>
 
+#ifdef PLATTFORM_WINDOWS
+#include <windows.h>
+#endif
+
 #include "ges-demo.h"
 #include "ges-renderer.h"
 
@@ -280,6 +284,9 @@ void renderTests(void) {
 int
 main (int argc, char **argv)
 {
+#ifdef PLATTFORM_WINDOWS
+  LoadLibrary("exchndl.dll");
+#endif
   gst_init (&argc, &argv);
   ges_init ();
 
