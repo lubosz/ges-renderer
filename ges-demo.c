@@ -97,9 +97,7 @@ transitionTL (void)
 
   ges_timeline_add_layer (timeline, layer);
 
-  // "sd/sintel_trailer-480p.ogv" makes warnings!
-
-  placeAsset (layer, path ("sd/3D fractal.webm"), 0, 0, 10);
+  placeAsset (layer, path ("sd/Mandelbox.mp4"), 0, 0, 10);
   placeAsset (layer, path ("sd/trailer_400p.ogg"), 7, 5, 10);
 
   ges_timeline_commit (timeline);
@@ -164,15 +162,15 @@ imageTL (void)
   timeline = palTimeline();
 
   layer = ges_layer_new ();
-  //g_object_set (layer, "auto-transition", TRUE, NULL);
+  g_object_set (layer, "auto-transition", TRUE, NULL);
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("images/LAMP_720_576.jpg"), 0, 0, 2);
-  placeAsset (layer, path ("images/wallpaper-2597248.jpg"), 2, 0, 2);
+  placeAsset (layer, path ("images/LAMP_720_576.jpg"), 0, 0, 3);
+  placeAsset (layer, path ("images/wallpaper-2597248.jpg"), 2, 0, 3);
   placeAsset (layer, path ("images/gradient1920x1080.jpg"),
-      4, 0, 2);
-  placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 6, 0, 2);
+      4, 0, 3);
+  placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 6, 0, 3);
 
   ges_timeline_commit (timeline);
 
@@ -187,13 +185,13 @@ pngTL (void)
 
   timeline = palTimeline();
   layer = ges_layer_new ();
-  //g_object_set (layer, "auto-transition", TRUE, NULL);
+  g_object_set (layer, "auto-transition", TRUE, NULL);
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("images/test1.png"), 0, 0, 2);
-  placeAsset (layer, path ("images/test2.png"), 2, 0, 2);
-  placeAsset (layer, path ("images/Fish.png"), 4, 0, 2);
+  placeAsset (layer, path ("images/test1.png"), 0, 0, 3);
+  placeAsset (layer, path ("images/test2.png"), 2, 0, 3);
+  placeAsset (layer, path ("images/Fish.png"), 4, 0, 3);
   placeAsset (layer, path ("images/PNG_transparency_demonstration_1.png"),
       6, 0, 2);
 

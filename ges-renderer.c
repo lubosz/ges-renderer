@@ -89,7 +89,7 @@ GstCaps * makeCaps(VideoSize * size) {
     GstCaps *caps;
     char capsstring[50];
     sprintf (capsstring,
-        "video/x-raw,width=%d,height=%d,framerate=%d/1",
+        "video/x-raw,width=%d,height=%d,framerate=%d/1,format=I420",
         size->width, size->height, size->fps);
 
     caps = gst_caps_from_string (capsstring);
