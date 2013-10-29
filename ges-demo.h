@@ -18,17 +18,14 @@ GESTimeline *effectTL (void);
 GESTimeline *testTL (void);
 GESTimeline *minuteTL (void);
 GESTimeline *imageTL (void);
-GESTimeline *oneTL (void);
 GESTimeline *musicTL (void);
 GESTimeline *hdTL (void);
 GESTimeline * pngTL (void);
 GESTimeline * transitionTL (void);
+GESTimeline * overlayTL (void);
 
 void playTests(void);
 void formatTests(void);
 void renderTests(void);
-void brokenRenderTests(void);
-
-char *replace(char *s, char old, char replacement);
 
 #endif // GESDEMO_H

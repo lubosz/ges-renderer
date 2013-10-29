@@ -221,17 +221,29 @@ hdTL (void)
 }
 
 GESTimeline *
-oneTL (void)
+overlayTL (void)
 {
   GESTimeline *timeline;
-  GESLayer *layer;
+  GESLayer *layer, *layer2;
 
   timeline = palTimeline();
   layer = ges_layer_new ();
+  layer2 = ges_layer_new();
+
+  ges_layer_set_priority(layer2, 1);
+
+  guint prio1 = ges_layer_get_priority(layer);
+  guint prio2 = ges_layer_get_priority(layer2);
+
+  g_object_set (layer, "auto-transition", TRUE, NULL);
+
+  g_print("prios %d %d\n", prio1, prio2);
 
   ges_timeline_add_layer (timeline, layer);
+  ges_timeline_add_layer (timeline, layer2);
 
-  placeAsset (layer, path ("sd/trailer_400p.ogg"), 0, 0, 5);
+  placeAsset (layer, path ("images/PNG_transparency_demonstration_1.png"), 0, 0, 10);
+  placeAsset (layer2, path ("hd/fluidsimulation.mp4"), 0, 0, 10);
 
   ges_timeline_commit (timeline);
 
@@ -290,25 +302,7 @@ void renderTests(void) {
     renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
     render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
     render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
-}
-
-void brokenRenderTests(void) {
-
-    //does not stop
-    render(testPatternTL(), "testpattern", PROFILE_AAC_H264_QUICKTIME);
-    // muxer negotiation problem
     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
-}
-
-char *replace(char *s, char old, char replacement) {
-    char *p = s;
-
-    while(*p) {
-        if(*p == old)
-            *p = replacement;
-        ++p;
-    }
-    return s;
 }
 
 int
@@ -321,7 +315,6 @@ main (int argc, char **argv)
 
   formatTests();
   renderTests();
-  //brokenRenderTests();
 
   return 0;
 }

@@ -40,8 +40,8 @@ struct VideoSize
 };
 
 void setPath(gchar * path);
-
 char *path (const char *filenName);
+char *replace(char *s, char old, char replacement);
 
 GESClip *placeAsset (GESLayer * layer, gchar * get_path, gint start, gint in,
     gint dur);

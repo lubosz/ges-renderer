@@ -19,6 +19,17 @@ void setPath(gchar * path) {
     dataPath = path;
 }
 
+char *replace(char *s, char old, char replacement) {
+    char *p = s;
+
+    while(*p) {
+        if(*p == old)
+            *p = replacement;
+        ++p;
+    }
+    return s;
+}
+
 void init_path(void) {
     char directory[1024];
     getcwd (directory, 1024);
