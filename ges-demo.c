@@ -20,29 +20,30 @@ testPatternTL (void)
   timeline = palTimeline();
 
   layer = ges_layer_new ();
-  //g_object_set (layer, "auto-transition", TRUE, NULL);
+  g_object_set (layer, "auto-transition", TRUE, NULL);
 
   ges_timeline_add_layer (timeline, layer);
 
   srca = ges_test_clip_new ();
   srcb = ges_test_clip_new ();
 
-  // no gst second in duration!
   g_object_set (srca,
       "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
-      "duration", 5,
+      "duration", 3 * GST_SECOND,
       "start", 0, NULL);
 
   g_object_set (srcb,
       "vpattern", GES_VIDEO_TEST_PATTERN_CIRCULAR,
-      "duration", 5,
-      "start", 5, NULL);
+      "duration", 3 * GST_SECOND,
+      "start", 2 * GST_SECOND, NULL);
   ges_test_clip_set_frequency (srcb, 800);
 
   ges_layer_add_clip (layer, GES_CLIP (srca));
   ges_layer_add_clip (layer, GES_CLIP (srcb));
 
   /*
+   * Non auto transition
+   *
      tr = ges_transition_clip_new_for_nick ("crossfade");
      g_object_set (tr,
      "start", tdur * GST_SECOND,
