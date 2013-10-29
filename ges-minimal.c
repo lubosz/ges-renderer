@@ -3,6 +3,8 @@
 #endif
 #include <ges/ges.h>
 
+void busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
+
 void
 busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
 {
