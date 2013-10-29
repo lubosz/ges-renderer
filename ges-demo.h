@@ -20,7 +20,6 @@ GESTimeline *minuteTL (void);
 GESTimeline *imageTL (void);
 GESTimeline *musicTL (void);
 GESTimeline *hdTL (void);
-GESTimeline * pngTL (void);
 GESTimeline * transitionTL (void);
 GESTimeline * overlayTL (void);
 

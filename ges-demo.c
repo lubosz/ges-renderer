@@ -166,34 +166,8 @@ imageTL (void)
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("images/LAMP_720_576.jpg"), 0, 0, 3);
-  placeAsset (layer, path ("images/wallpaper-2597248.jpg"), 2, 0, 3);
-  placeAsset (layer, path ("images/gradient1920x1080.jpg"),
-      4, 0, 3);
-  placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 6, 0, 3);
-
-  ges_timeline_commit (timeline);
-
-  return timeline;
-}
-
-GESTimeline *
-pngTL (void)
-{
-  GESTimeline *timeline;
-  GESLayer *layer;
-
-  timeline = palTimeline();
-  layer = ges_layer_new ();
-  g_object_set (layer, "auto-transition", TRUE, NULL);
-
-  ges_timeline_add_layer (timeline, layer);
-
-  placeAsset (layer, path ("images/test1.png"), 0, 0, 3);
-  placeAsset (layer, path ("images/test2.png"), 2, 0, 3);
-  placeAsset (layer, path ("images/Fish.png"), 4, 0, 3);
-  placeAsset (layer, path ("images/PNG_transparency_demonstration_1.png"),
-      6, 0, 2);
+  placeAsset (layer, path ("images/LAMP_720_576.jpg"), 0, 0, 6);
+  placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 3, 0, 6);
 
   ges_timeline_commit (timeline);
 
@@ -295,8 +269,6 @@ void formatTests(void) {
 void renderTests(void) {
     render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
     render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
-
-    render(pngTL(), "image-png", PROFILE_AAC_H264_QUICKTIME);
 
     VideoSize hd = { 1280, 720, 30 };
     renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
