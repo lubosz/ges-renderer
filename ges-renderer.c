@@ -60,11 +60,16 @@ placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur,
 {
   GError **error = NULL;
   GESAsset *asset;
+  GESClip * clip;
 
   asset = GES_ASSET (ges_uri_clip_asset_request_sync (path, error));
 
-  return ges_layer_add_asset (layer, asset,
+  clip = ges_layer_add_asset (layer, asset,
       start * GST_SECOND, in * GST_SECOND, dur * GST_SECOND, tt);
+
+  gst_object_unref(asset);
+
+  return clip;
 }
 
 void
@@ -149,7 +154,7 @@ encoderProfile (EncodingProfile type, VideoSize * size)
 gboolean
 durationQuerier (void)
 {
-  gint64 position;
+  gint64 position = 0;
 
   gst_element_query_position (GST_ELEMENT (pipeline),
       GST_FORMAT_TIME, &position);
@@ -162,7 +167,7 @@ durationQuerier (void)
   float durationSec = (float) duration / GST_SECOND;
 
   if (position > 0)
-    g_print ("\r%.2f%% %.2f/%.2fs                                ", percent, positionSec, durationSec);
+    g_print ("\r%.2f%% %.2f/%.2fs", percent, positionSec, durationSec);
 
   return TRUE;
 }
@@ -213,10 +218,15 @@ runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
   g_signal_connect (bus, "message", (GCallback) busMessageCb, mainloop);
   g_timeout_add (100, (GSourceFunc) durationQuerier, NULL);
   gst_bus_add_signal_watch (bus);
+  gst_object_unref(bus);
 
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 
   g_main_loop_run (mainloop);
+
+  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+  gst_object_unref(pipeline);
+
   g_main_loop_unref (mainloop);
 }
 
