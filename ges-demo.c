@@ -297,8 +297,8 @@ main (int argc, char **argv)
 
   init_path();
 
-  formatTests();
   renderTests();
+  formatTests();
 
   return 0;
 }
