@@ -67,12 +67,14 @@ if( WIN32 )
 	  ${CMAKE_SOURCE_DIR}/ges-demo.exe
 	  ${CMAKE_SOURCE_DIR}/ges-minimal.exe
 	  ${CMAKE_SOURCE_DIR}/ges-json.exe
+    ${CMAKE_SOURCE_DIR}/ges-json-transition.exe
   )
 else()
   set (INSTALL_BINARIES
 	  ${CMAKE_SOURCE_DIR}/ges-demo
 	  ${CMAKE_SOURCE_DIR}/ges-minimal
 	  ${CMAKE_SOURCE_DIR}/ges-json
+    ${CMAKE_SOURCE_DIR}/ges-json-transition
   )
 endif()
 
