@@ -232,15 +232,20 @@ GESTimeline *
 musicTL (void)
 {
   GESTimeline *timeline;
+
+  timeline = ges_timeline_new_audio_video ();
+
   GESLayer *layer = ges_layer_new ();
   GESLayer *audiolayer1 = ges_layer_new ();
   GESLayer *audiolayer2 = ges_layer_new ();
 
-  timeline = ges_timeline_new_audio_video ();
-
   ges_timeline_add_layer (timeline, layer);
   ges_timeline_add_layer (timeline, audiolayer1);
   ges_timeline_add_layer (timeline, audiolayer2);
+
+  g_object_set (layer, "priority", 0, NULL);
+  g_object_set (audiolayer1, "priority", 1, NULL);
+  g_object_set (audiolayer2, "priority", 2, NULL);
 
   placeAssetType (layer, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
       GES_TRACK_TYPE_VIDEO);

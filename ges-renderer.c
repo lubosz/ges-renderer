@@ -223,11 +223,11 @@ runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 
   g_main_loop_run (mainloop);
+  g_main_loop_unref (mainloop);
 
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
-  gst_object_unref(pipeline);
 
-  g_main_loop_unref (mainloop);
+  gst_object_unref(pipeline);
 }
 
 void
