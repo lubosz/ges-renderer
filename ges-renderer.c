@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-static gchar *dataPath;
+static gchar *data_path;
 static GESPipeline *pipeline = NULL;
 static GstClockTime duration;
 static gboolean wasError = FALSE;
@@ -31,16 +31,16 @@ void ges_renderer_init_path(void) {
     getcwd (directory, 1024);
   #ifdef PLATTFORM_WINDOWS
     char * replaced = replace (directory, '\\', '/');
-    dataPath = g_strconcat ("file:///", replaced, "/data/", NULL);
+    data_path = g_strconcat ("file:///", replaced, "/data/", NULL);
   #else
-    dataPath = g_strconcat ("file://", &directory, "/data/", NULL);
+    data_path = g_strconcat ("file://", &directory, "/data/", NULL);
   #endif
 }
 
 char *
 ges_renderer_get_absolute_path (const char *rel_path)
 {
-  return g_strconcat (dataPath, rel_path, NULL);
+  return g_strconcat (data_path, rel_path, NULL);
 }
 
 
@@ -204,7 +204,7 @@ ges_pipeline_setup_rendering (GESPipeline * pipeline, EncodingProfile prof,
     const gchar * name, VideoSize * size)
 {
   gchar *fileName =
-      g_strconcat (dataPath, "export/", name, ".", profiles[prof][3], NULL);
+      g_strconcat (data_path, "export/", name, ".", profiles[prof][3], NULL);
   g_print ("Rendering %s\n", fileName);
 
   GstEncodingProfile *profile = gst_encoding_profile_from_type (prof, size);

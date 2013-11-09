@@ -14,8 +14,7 @@
 #include "ges-demo.h"
 #include "ges-renderer.h"
 
-GESTimeline *
-testPatternTL (void)
+GESTimeline * testPatternTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -51,8 +50,7 @@ testPatternTL (void)
   return timeline;
 }
 
-GESTimeline *
-effectTL (void)
+GESTimeline * effectTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -78,8 +76,7 @@ effectTL (void)
   return timeline;
 }
 
-GESTimeline *
-transitionTL (void)
+GESTimeline * transitionTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -99,8 +96,7 @@ transitionTL (void)
   return timeline;
 }
 
-GESTimeline *
-testTL (void)
+GESTimeline * testTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -124,8 +120,7 @@ testTL (void)
 }
 
 
-GESTimeline *
-minuteTL (void)
+GESTimeline * minuteTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -145,8 +140,7 @@ minuteTL (void)
   return timeline;
 }
 
-GESTimeline *
-imageTL (void)
+GESTimeline * imageTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -166,8 +160,7 @@ imageTL (void)
   return timeline;
 }
 
-GESTimeline *
-hdTL (void)
+GESTimeline * hdTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
@@ -186,8 +179,7 @@ hdTL (void)
   return timeline;
 }
 
-GESTimeline *
-overlayTL (void)
+GESTimeline * overlayTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer, *layer2;
@@ -216,8 +208,7 @@ overlayTL (void)
   return timeline;
 }
 
-GESTimeline *
-musicTL (void)
+GESTimeline * musicTL (void)
 {
   GESTimeline *timeline;
 
@@ -247,8 +238,7 @@ musicTL (void)
   return timeline;
 }
 
-GESTimeline *
-pngTransparencyTL (void)
+GESTimeline * videoTransparencyTL (void)
 {
   GESTimeline *timeline;
   GESTrack *trackv;
@@ -285,8 +275,7 @@ pngTransparencyTL (void)
   return timeline;
 }
 
-GESTimeline *
-alphaTestTL (void)
+GESTimeline * alphaTestTL (void)
 {
   GESTimeline *timeline;
 
@@ -328,8 +317,7 @@ alphaTestTL (void)
   return timeline;
 }
 
-GESTimeline *
-volumeTestTL (void)
+GESTimeline * volumeTestTL (void)
 {
   GESTimeline *timeline;
 
@@ -446,8 +434,7 @@ GESTimeline * positionTestTL (void)
                           ges_renderer_get_absolute_path("image/wallpaper720p.jpg"),
                          error));
 
-  clip = ges_layer_add_asset (layer, asset,
-      0, 0, 2 * GST_SECOND, GES_TRACK_TYPE_VIDEO);
+  clip = ges_layer_add_asset (layer, asset, 0, 0, 2 * GST_SECOND, GES_TRACK_TYPE_VIDEO);
 
   GESTrackElement* elem = ges_clip_find_track_element(clip, trackv, G_TYPE_NONE);
 
