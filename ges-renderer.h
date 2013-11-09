@@ -39,45 +39,43 @@ struct VideoSize
   gint fps;
 };
 
-void setPath(gchar * path);
-char *path (const char *filenName);
+char *ges_renderer_get_absolute_path (const char *rel_path);
 char *replace(char *s, char old, char replacement);
 
-GESClip *placeAsset (GESLayer * layer, gchar * get_path, gint start, gint in,
+GESClip *ges_clip_unknown_from_rel_path (const gchar * get_path, GESLayer * layer, gint start, gint in,
     gint dur);
-GESClip *placeAssetType (GESLayer * layer, gchar * path, gint start, gint in,
+GESClip *ges_clip_from_path (const gchar *ges_renderer_get_absolute_path, GESLayer * layer, gint start, gint in,
+    gint dur, GESTrackType tt);
+GESClip *ges_clip_from_rel_path (const gchar *rel_path, GESLayer * layer, gint start, gint in,
     gint dur, GESTrackType tt);
 
-void busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
+void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
-GstEncodingProfile *encoderProfile (EncodingProfile type, VideoSize * size);
+GstEncodingProfile *gst_encoding_profile_from_type (EncodingProfile type, VideoSize * size);
 
-gboolean durationQuerier (void);
+gboolean ges_renderer_print_progress (void);
 
-void renderPipeline (GESPipeline * pipeline, EncodingProfile prof,
+void ges_pipeline_setup_rendering (GESPipeline * pipeline, EncodingProfile prof,
     const gchar * name, VideoSize * size);
 
-GESPipeline *newPipeline (GESTimeline * timeline);
-void runJob (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
+GESPipeline *ges_pipeline_from_timeline (GESTimeline * timeline);
+void ges_renderer_run_job (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
     VideoSize * size);
 
-void play (GESTimeline * timeline);
-void render (GESTimeline * timeline, const gchar * name, EncodingProfile prof);
-void renderWithSize (GESTimeline * timeline, const gchar * name,
+void ges_renderer_play (GESTimeline * timeline);
+void ges_renderer_render_pal (GESTimeline * timeline, const gchar * name, EncodingProfile prof);
+void ges_renderer_render (GESTimeline * timeline, const gchar * name,
     EncodingProfile prof, VideoSize * size);
 
-void printTarget(GstEncodingTarget *target);
-void listProfiles(void);
+void ges_renderer_init_path(void);
 
-void init_path(void);
+GstCaps * gst_caps_from_videosize(VideoSize *size);
 
-GstCaps * makeCaps(VideoSize *size);
+GESTimeline * ges_timeline_new_pal(void);
+GESTimeline * ges_timeline_audio_video_from_videosize(VideoSize * size);
 
-GESTimeline * palTimeline(void);
-GESTimeline * newTimeline(VideoSize * size);
-
-guint ges_asset_get_structure_int(GESUriClipAsset * asset, const char * name);
-guint ges_asset_get_width(GESUriClipAsset *asset);
-guint ges_asset_get_height(GESUriClipAsset * asset);
+gint ges_asset_get_structure_int(GESUriClipAsset * asset, const char * name);
+gint ges_asset_get_width(GESUriClipAsset *asset);
+gint ges_asset_get_height(GESUriClipAsset * asset);
 
 #endif // GES_RENDERER_H

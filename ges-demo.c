@@ -21,7 +21,7 @@ testPatternTL (void)
   GESLayer *layer;
   GESTestClip *srca, *srcb;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
 
   layer = ges_layer_new ();
   g_object_set (layer, "auto-transition", TRUE, NULL);
@@ -69,13 +69,13 @@ effectTL (void)
   GESClip *clip1, *clip2;
   GESEffect *effect1, *effect2;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
 
-  clip1 = placeAsset (layer, path ("sd/trailer_400p.ogg"), 0, 0, 10);
-  clip2 = placeAsset (layer, path ("sd/sintel_trailer-480p.ogv"), 10, 5, 10);
+  clip1 = ges_clip_unknown_from_rel_path ("sd/trailer_400p.ogg", layer, 0, 0, 10);
+  clip2 = ges_clip_unknown_from_rel_path ("sd/sintel_trailer-480p.ogv", layer, 10, 5, 10);
 
   effect1 = ges_effect_new ("agingtv");
   ges_container_add (GES_CONTAINER (clip1), GES_TIMELINE_ELEMENT (effect1));
@@ -94,15 +94,15 @@ transitionTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
   layer = ges_layer_new ();
 
   g_object_set (layer, "auto-transition", TRUE, NULL);
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("sd/Mandelbox.mp4"), 0, 0, 10);
-  placeAsset (layer, path ("sd/trailer_400p.ogg"), 7, 5, 10);
+  ges_clip_unknown_from_rel_path ("sd/Mandelbox.mp4", layer, 0, 0, 10);
+  ges_clip_unknown_from_rel_path ("sd/trailer_400p.ogg", layer, 7, 5, 10);
 
   ges_timeline_commit (timeline);
 
@@ -115,7 +115,7 @@ testTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -140,17 +140,15 @@ minuteTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer,
-      path ("sd/Black Ink and Water Test - A Place in Time Song.mp4"),
-      0, 0, 15);
-  placeAsset (layer, path ("sd/trailer_400p.ogg"), 15, 2, 15);
-  placeAsset (layer, path ("sd/sintel_trailer-480p.mp4"), 30, 4, 15);
-  placeAsset (layer, path ("hd/fluidsimulation.mp4"), 45, 0, 15);
+  ges_clip_unknown_from_rel_path ("sd/Black Ink and Water Test - A Place in Time Song.mp4", layer, 0, 0, 15);
+  ges_clip_unknown_from_rel_path ("sd/trailer_400p.ogg", layer, 15, 2, 15);
+  ges_clip_unknown_from_rel_path ("sd/sintel_trailer-480p.mp4", layer, 30, 4, 15);
+  ges_clip_unknown_from_rel_path ("hd/fluidsimulation.mp4", layer, 45, 0, 15);
 
   ges_timeline_commit (timeline);
 
@@ -163,15 +161,15 @@ imageTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
 
   layer = ges_layer_new ();
   g_object_set (layer, "auto-transition", TRUE, NULL);
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("images/LAMP_720_576.jpg"), 0, 0, 6);
-  placeAsset (layer, path ("images/wallpaper-1946968.jpg"), 3, 0, 6);
+  ges_clip_unknown_from_rel_path ("images/LAMP_720_576.jpg",layer, 0, 0, 6);
+  ges_clip_unknown_from_rel_path ("images/wallpaper-1946968.jpg", layer, 3, 0, 6);
 
   ges_timeline_commit (timeline);
 
@@ -185,13 +183,13 @@ hdTL (void)
   GESLayer *layer;
 
   VideoSize hd = { 1280, 720, 30 };
-  timeline = newTimeline(&hd);
+  timeline = ges_timeline_audio_video_from_videosize(&hd);
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
 
-  placeAsset (layer, path ("hd/BlenderFluid.webm"), 0, 4, 5);
-  placeAsset (layer, path ("hd/fluidsimulation.mp4"), 5, 7, 5);
+  ges_clip_unknown_from_rel_path ("hd/BlenderFluid.webm", layer, 0, 4, 5);
+  ges_clip_unknown_from_rel_path ("hd/fluidsimulation.mp4", layer, 5, 7, 5);
 
   ges_timeline_commit (timeline);
 
@@ -204,7 +202,7 @@ overlayTL (void)
   GESTimeline *timeline;
   GESLayer *layer, *layer2;
 
-  timeline = palTimeline();
+  timeline = ges_timeline_new_pal();
   layer = ges_layer_new ();
   layer2 = ges_layer_new();
 
@@ -220,8 +218,8 @@ overlayTL (void)
   ges_timeline_add_layer (timeline, layer);
   ges_timeline_add_layer (timeline, layer2);
 
-  placeAsset (layer, path ("images/PNG_transparency_demonstration_1.png"), 0, 0, 10);
-  placeAsset (layer2, path ("hd/fluidsimulation.mp4"), 0, 0, 10);
+  ges_clip_unknown_from_rel_path ("images/PNG_transparency_demonstration_1.png", layer, 0, 0, 10);
+  ges_clip_unknown_from_rel_path ("hd/fluidsimulation.mp4", layer2, 0, 0, 10);
 
   ges_timeline_commit (timeline);
 
@@ -247,11 +245,11 @@ musicTL (void)
   g_object_set (audiolayer1, "priority", 1, NULL);
   g_object_set (audiolayer2, "priority", 2, NULL);
 
-  placeAssetType (layer, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
+  ges_clip_from_rel_path ("hd/fluidsimulation.mp4", layer, 0, 20, 10,
       GES_TRACK_TYPE_VIDEO);
-  placeAssetType (audiolayer1, path ("audio/prof.ogg"), 0, 0, 10,
+  ges_clip_from_rel_path ("audio/prof.ogg", audiolayer1, 0, 0, 10,
       GES_TRACK_TYPE_AUDIO);
-  placeAssetType (audiolayer2, path ("audio/vask.wav"), 2, 0, 7,
+  ges_clip_from_rel_path ("audio/vask.wav", audiolayer2, 2, 0, 7,
       GES_TRACK_TYPE_AUDIO);
 
   ges_timeline_commit (timeline);
@@ -284,13 +282,13 @@ pngTransparencyTL (void)
   ges_timeline_add_layer (timeline, layer1);
   g_object_set (layer1, "priority", 0, NULL);
 
-  placeAssetType (layer1, path ("transparent/bokeeh.mov"), 0, 0, 10, GES_TRACK_TYPE_VIDEO);
+  ges_clip_from_rel_path ("transparent/bokeeh.mov", layer1, 0, 0, 10, GES_TRACK_TYPE_VIDEO);
 //  placeAssetType (layer1, path ("image/Fish.png"), 0, 0, 10, GES_TRACK_TYPE_VIDEO);
 
   GESLayer *layer2 = ges_layer_new ();
   ges_timeline_add_layer (timeline, layer2);
   g_object_set (layer2, "priority", 1, NULL);
-  placeAssetType (layer2, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
+  ges_clip_from_rel_path ("hd/fluidsimulation.mp4", layer2, 0, 20, 10,
       GES_TRACK_TYPE_VIDEO);
 
   ges_timeline_commit (timeline);
@@ -314,7 +312,7 @@ alphaTestTL (void)
   }
 
   VideoSize pal = { 720, 576, 25 };
-  GstCaps * caps = makeCaps(&pal);
+  GstCaps * caps = gst_caps_from_videosize(&pal);
   ges_track_set_restriction_caps(trackv, caps);
 
   GESLayer *layer1 = ges_layer_new ();
@@ -326,7 +324,7 @@ alphaTestTL (void)
   g_object_set (layer1, "priority", 0, NULL);
   g_object_set (layer2, "priority", 1, NULL);
 
-  GESClip * png = placeAssetType (layer1, path ("image/Fish.png"), 0, 0, 10,
+  GESClip * png = ges_clip_from_rel_path ("image/Fish.png", layer1, 0, 0, 10,
       GES_TRACK_TYPE_VIDEO);
 
   GESTrackElement* elem = ges_clip_find_track_element(png, trackv, G_TYPE_NONE);
@@ -337,7 +335,7 @@ alphaTestTL (void)
 
   ges_track_element_set_child_property (elem, "alpha", &a);
 
-  placeAssetType (layer2, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
+  ges_clip_from_rel_path ("hd/fluidsimulation.mp4", layer2, 0, 20, 10,
       GES_TRACK_TYPE_VIDEO);
 
   ges_timeline_commit (timeline);
@@ -369,9 +367,9 @@ volumeTestTL (void)
   g_object_set (layer1, "priority", 0, NULL);
   g_object_set (layer2, "priority", 1, NULL);
 
-  GESClip * music1 = placeAssetType (layer1, path ("audio/02_Oliver_Huntemann_-_Rikarda.flac"), 0, 0, 10,
+  GESClip * music1 = ges_clip_from_rel_path ("audio/02_Oliver_Huntemann_-_Rikarda.flac", layer1, 0, 0, 10,
       GES_TRACK_TYPE_AUDIO);
-  placeAssetType (layer2, path ("audio/prof.ogg"), 0, 0, 10, GES_TRACK_TYPE_AUDIO);
+  ges_clip_from_rel_path ("audio/prof.ogg", layer2, 0, 0, 10, GES_TRACK_TYPE_AUDIO);
 
   GESTrackElement* elem = ges_clip_find_track_element(music1, tracka, G_TYPE_NONE);
 
@@ -416,7 +414,7 @@ GESTimeline * compTL (void)
 
       g_print("asset %s\n", assets[i-1]);
 
-      GESClip * vieh = placeAssetType (layer, path (assets[i-1]), 0, 0, 10,
+      GESClip * vieh = ges_clip_from_rel_path (assets[i-1], layer, 0, 0, 10,
           GES_TRACK_TYPE_VIDEO);
 
       GESTrackElement* elem = ges_clip_find_track_element(
@@ -433,7 +431,7 @@ GESTimeline * compTL (void)
   GESLayer *backgroud_layer = ges_layer_new ();
   ges_timeline_add_layer (timeline, backgroud_layer);
   g_object_set (backgroud_layer, "priority", asset_count, NULL);
-  placeAssetType (backgroud_layer, path ("image/wallpaper-2597248.jpg"), 0, 0, 10,
+  ges_clip_from_rel_path ("image/wallpaper-2597248.jpg", backgroud_layer, 0, 0, 10,
       GES_TRACK_TYPE_VIDEO);
 
   ges_timeline_commit (timeline);
@@ -464,7 +462,7 @@ GESTimeline * positionTestTL (void)
   ges_timeline_add_layer (timeline, layer);
 
   asset = GES_ASSET (ges_uri_clip_asset_request_sync (
-                         path ("image/wallpaper720p.jpg"),
+                          ges_renderer_get_absolute_path("image/wallpaper720p.jpg"),
                          error));
 
   clip = ges_layer_add_asset (layer, asset,
@@ -491,37 +489,37 @@ GESTimeline * positionTestTL (void)
 }
 
 void playTests(void) {
-    play(hdTL());
-    play(musicTL());
-    play(testTL());
-    play(transitionTL());
-    play(effectTL());
-    play(minuteTL());
+    ges_renderer_play(hdTL());
+    ges_renderer_play(musicTL());
+    ges_renderer_play(testTL());
+    ges_renderer_play(transitionTL());
+    ges_renderer_play(effectTL());
+    ges_renderer_play(minuteTL());
 }
 
 void formatTests(void) {
-    render(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
-    render(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
-    render(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
-    render(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
+    ges_renderer_render_pal(testTL(), "formats", PROFILE_VORBIS_VP8_WEBM);
+    ges_renderer_render_pal(testTL(), "formats", PROFILE_VORBIS_THEORA_OGG);
+    ges_renderer_render_pal(testTL(), "formats", PROFILE_AAC_H264_QUICKTIME);
+    ges_renderer_render_pal(testTL(), "formats", PROFILE_VORBIS_H264_MATROSKA);
 }
 
 void renderTests(void) {
-    render(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
-    render(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
+    ges_renderer_render_pal(effectTL(), "effect", PROFILE_AAC_H264_QUICKTIME);
+    ges_renderer_render_pal(minuteTL(), "1minute", PROFILE_AAC_H264_QUICKTIME);
 
     VideoSize hd = { 1280, 720, 30 };
-    renderWithSize(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
-    render(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
-    render(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
-    render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
+    ges_renderer_render(hdTL(), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
+    ges_renderer_render_pal(musicTL(), "audio", PROFILE_AAC_H264_QUICKTIME);
+    ges_renderer_render_pal(imageTL(), "image", PROFILE_AAC_H264_QUICKTIME);
+    ges_renderer_render_pal(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 }
 
 void newTests(void) {
-  play(compTL());
-  play(volumeTestTL());
-  play(alphaTestTL());
-  play(pngTransparencyTL());
+  ges_renderer_play(compTL());
+  ges_renderer_play(volumeTestTL());
+  ges_renderer_play(alphaTestTL());
+  ges_renderer_play(pngTransparencyTL());
 }
 
 int
@@ -533,7 +531,7 @@ main (int argc, char **argv)
   gst_init (&argc, &argv);
   ges_init ();
 
-  init_path();
+  ges_renderer_init_path();
 
   formatTests();
   renderTests();

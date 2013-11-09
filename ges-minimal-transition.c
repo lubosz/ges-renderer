@@ -1,10 +1,10 @@
 #include <ges/ges.h>
 #include <stdio.h>
 
-GstCaps * makeCaps(int w, int h, int fps);
-GstEncodingProfile * encoderProfile (GstCaps * settings);
-gboolean durationQuerier (void);
-void busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
+GstCaps * gst_caps_from_videosize(int w, int h, int fps);
+GstEncodingProfile * gst_encoding_profile_from_type (GstCaps * settings);
+gboolean ges_renderer_print_progress (void);
+void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
 static GstClockTime duration;
 GESPipeline *pipeline;
@@ -15,7 +15,7 @@ static const char *const profile[4] = {
     "audio/mpeg,mpegversion=1,layer=3"
 };
 
-GstCaps * makeCaps(int w, int h, int fps) {
+GstCaps * gst_caps_from_videosize(int w, int h, int fps) {
     GstCaps *caps;
     char capsstring[50];
     sprintf (capsstring,
@@ -28,7 +28,7 @@ GstCaps * makeCaps(int w, int h, int fps) {
 }
 
 GstEncodingProfile *
-encoderProfile (GstCaps *settings)
+gst_encoding_profile_from_type (GstCaps *settings)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
@@ -59,7 +59,7 @@ encoderProfile (GstCaps *settings)
 }
 
 gboolean
-durationQuerier (void)
+ges_renderer_print_progress (void)
 {
   gint64 position;
 
@@ -78,7 +78,7 @@ durationQuerier (void)
 }
 
 void
-busMessageCb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
+bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
 {
   switch (GST_MESSAGE_TYPE (message)) {
     case GST_MESSAGE_ERROR:{
@@ -140,8 +140,8 @@ main (int argc, char **argv)
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 
-  GstCaps* settings = makeCaps(720, 576, 25);
-  GstEncodingProfile *profile = encoderProfile (settings);
+  GstCaps* settings = gst_caps_from_videosize(720, 576, 25);
+  GstEncodingProfile *profile = gst_encoding_profile_from_type (settings);
   ges_pipeline_set_render_settings (pipeline, exportURL, profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 
@@ -150,8 +150,8 @@ main (int argc, char **argv)
 
   GstBus *bus;
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
-  g_signal_connect (bus, "message", (GCallback) busMessageCb, mainloop);
-  g_timeout_add (100, (GSourceFunc) durationQuerier, NULL);
+  g_signal_connect (bus, "message", (GCallback) bus_message_cb, mainloop);
+  g_timeout_add (100, (GSourceFunc) ges_renderer_print_progress, NULL);
   gst_bus_add_signal_watch (bus);
 
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);

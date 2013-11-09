@@ -55,7 +55,7 @@ void getAssets(JsonReader *reader, const gchar *member_name, GESTimeline * timel
         int in = getInt(reader, "in");
         int dur = getInt(reader, "dur");
         g_print("Clip: %s (start: %d, in: %d, dur: %d)\n", src, start, in, dur);
-        GESClip * clip = placeAssetType (layer, path (src), start, in, dur, type);
+        GESClip * clip = ges_clip_from_path (ges_renderer_get_absolute_path (src), layer, start, in, dur, type);
 
         if (is_in_members(reader, "effect")) {
             const char *effect_str = getString(reader, "effect");
@@ -107,7 +107,7 @@ void render_json(JsonNode *root) {
     g_print("Resolution: %dx%d, FPS: %d\n", width, height, fps);
 
     VideoSize res = { width, height, fps };
-    jsonTimeline = newTimeline(&res);
+    jsonTimeline = ges_timeline_audio_video_from_videosize(&res);
 
     // videos
     getAssets(reader, "video", jsonTimeline, GES_TRACK_TYPE_UNKNOWN, autotransition);
@@ -136,7 +136,7 @@ void render_json(JsonNode *root) {
         } else if (strcmp(format, "ogg") == 0) {
             prof = PROFILE_VORBIS_THEORA_OGG;
         }
-        renderWithSize(jsonTimeline, name, prof, &res);
+        ges_renderer_render(jsonTimeline, name, prof, &res);
     }
     json_reader_end_member (reader);
 
@@ -175,7 +175,7 @@ int main (int argc, char *argv[]) {
   gst_init (&argc, &argv);
   ges_init ();
 
-  init_path();
+  ges_renderer_init_path();
 
   render_json(root);
 
