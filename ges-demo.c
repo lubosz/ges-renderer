@@ -488,7 +488,7 @@ main (int argc, char **argv)
   gst_init (&argc, &argv);
   ges_init ();
 
-  ges_renderer_init_path();
+  ges_renderer_init();
 
   formatTests();
   renderTests();

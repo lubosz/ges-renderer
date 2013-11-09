@@ -25,6 +25,11 @@ char *replace(char *s, char old, char replacement) {
     return s;
 }
 
+void ges_renderer_init(void) {
+    duration = 0;
+    ges_renderer_init_path();
+}
+
 void ges_renderer_init_path(void) {
     duration = 0;
     char directory[1024];
