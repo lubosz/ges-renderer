@@ -259,6 +259,237 @@ musicTL (void)
   return timeline;
 }
 
+GESTimeline *
+pngTransparencyTL (void)
+{
+  GESTimeline *timeline;
+  GESTrack *trackv;
+  timeline = ges_timeline_new ();
+
+  trackv = GES_TRACK (ges_video_track_new ());
+
+  ges_timeline_add_track (timeline, trackv);
+
+  GstCaps *caps;
+//  const gchar * capsstring = "video/x-raw,width=720,height=576,framerate=25/1,format=I420";
+  const gchar * capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
+
+  caps = gst_caps_from_string (capsstring);
+  gchar * capstring = gst_caps_to_string(caps);
+  g_print("caps: %s\n", capstring);
+
+  ges_track_set_restriction_caps(trackv, caps);
+
+  GESLayer *layer1 = ges_layer_new ();
+  ges_timeline_add_layer (timeline, layer1);
+  g_object_set (layer1, "priority", 0, NULL);
+
+  placeAssetType (layer1, path ("transparent/bokeeh.mov"), 0, 0, 10, GES_TRACK_TYPE_VIDEO);
+//  placeAssetType (layer1, path ("image/Fish.png"), 0, 0, 10, GES_TRACK_TYPE_VIDEO);
+
+  GESLayer *layer2 = ges_layer_new ();
+  ges_timeline_add_layer (timeline, layer2);
+  g_object_set (layer2, "priority", 1, NULL);
+  placeAssetType (layer2, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
+      GES_TRACK_TYPE_VIDEO);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+GESTimeline *
+alphaTestTL (void)
+{
+  GESTimeline *timeline;
+
+  GESTrack *trackv;
+  timeline = ges_timeline_new ();
+
+  trackv = GES_TRACK (ges_video_track_new ());
+
+  if (!ges_timeline_add_track (timeline, trackv)) {
+    gst_object_unref (timeline);
+    timeline = NULL;
+  }
+
+  VideoSize pal = { 720, 576, 25 };
+  GstCaps * caps = makeCaps(&pal);
+  ges_track_set_restriction_caps(trackv, caps);
+
+  GESLayer *layer1 = ges_layer_new ();
+  GESLayer *layer2 = ges_layer_new ();
+
+  ges_timeline_add_layer (timeline, layer1);
+  ges_timeline_add_layer (timeline, layer2);
+
+  g_object_set (layer1, "priority", 0, NULL);
+  g_object_set (layer2, "priority", 1, NULL);
+
+  GESClip * png = placeAssetType (layer1, path ("image/Fish.png"), 0, 0, 10,
+      GES_TRACK_TYPE_VIDEO);
+
+  GESTrackElement* elem = ges_clip_find_track_element(png, trackv, G_TYPE_NONE);
+
+  GValue a = G_VALUE_INIT;
+  g_value_init (&a, G_TYPE_DOUBLE);
+  g_value_set_double (&a, 0.5);
+
+  ges_track_element_set_child_property (elem, "alpha", &a);
+
+  placeAssetType (layer2, path ("hd/fluidsimulation.mp4"), 0, 20, 10,
+      GES_TRACK_TYPE_VIDEO);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+GESTimeline *
+volumeTestTL (void)
+{
+  GESTimeline *timeline;
+
+  GESTrack *tracka;
+  timeline = ges_timeline_new ();
+
+  tracka = GES_TRACK (ges_audio_track_new ());
+
+  if (!ges_timeline_add_track (timeline, tracka)) {
+    gst_object_unref (timeline);
+    timeline = NULL;
+  }
+
+  GESLayer *layer1 = ges_layer_new ();
+  GESLayer *layer2 = ges_layer_new ();
+
+  ges_timeline_add_layer (timeline, layer1);
+  ges_timeline_add_layer (timeline, layer2);
+
+  g_object_set (layer1, "priority", 0, NULL);
+  g_object_set (layer2, "priority", 1, NULL);
+
+  GESClip * music1 = placeAssetType (layer1, path ("audio/02_Oliver_Huntemann_-_Rikarda.flac"), 0, 0, 10,
+      GES_TRACK_TYPE_AUDIO);
+  placeAssetType (layer2, path ("audio/prof.ogg"), 0, 0, 10, GES_TRACK_TYPE_AUDIO);
+
+  GESTrackElement* elem = ges_clip_find_track_element(music1, tracka, G_TYPE_NONE);
+
+  GValue vol = G_VALUE_INIT;
+  g_value_init (&vol, G_TYPE_DOUBLE);
+  g_value_set_double (&vol, 0.1);
+
+  ges_track_element_set_child_property (elem, "volume", &vol);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+
+GESTimeline * compTL (void)
+{
+  GESTimeline *timeline;
+  GESTrack *trackv;
+
+  timeline = ges_timeline_new ();
+  trackv = GES_TRACK (ges_video_track_new ());
+  ges_timeline_add_track (timeline, trackv);
+
+  const gchar * capsstring = "video/x-raw,width=1920,height=1080,framerate=25/1";
+  GstCaps * caps = gst_caps_from_string (capsstring);
+  gchar * capstring = gst_caps_to_string(caps);
+  g_print("caps: %s\n", capstring);
+//  ges_track_set_restriction_caps(trackv, caps);
+
+  const gchar* assets[] = {"image/vieh.png",
+                    "image/PNG_transparency_demonstration_1.png",
+                    "image/Ice_Cream.png",
+                    "image/Fish.png"};
+
+  guint asset_count = 4;
+
+  for (int i = 1; i <= asset_count; i++) {
+      GESLayer *layer = ges_layer_new ();
+      ges_timeline_add_layer (timeline, layer);
+      g_object_set (layer, "priority", i - 1, NULL);
+
+      g_print("asset %s\n", assets[i-1]);
+
+      GESClip * vieh = placeAssetType (layer, path (assets[i-1]), 0, 0, 10,
+          GES_TRACK_TYPE_VIDEO);
+
+      GESTrackElement* elem = ges_clip_find_track_element(
+                  vieh, trackv, G_TYPE_NONE);
+
+      ges_track_element_set_child_properties (elem,
+                                              "posx", i * 100,
+                                              "posy", i * 100,
+                                              "width", i * 100,
+                                              "height", i * 100,
+                                               NULL);
+  }
+
+  GESLayer *backgroud_layer = ges_layer_new ();
+  ges_timeline_add_layer (timeline, backgroud_layer);
+  g_object_set (backgroud_layer, "priority", asset_count, NULL);
+  placeAssetType (backgroud_layer, path ("image/wallpaper-2597248.jpg"), 0, 0, 10,
+      GES_TRACK_TYPE_VIDEO);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+
+GESTimeline * positionTestTL (void)
+{
+  GESTimeline *timeline;
+  GESTrack *trackv;
+  GError **error = NULL;
+  GESAsset *asset;
+  GESClip * clip;
+
+  timeline = ges_timeline_new ();
+  trackv = GES_TRACK (ges_video_track_new ());
+  ges_timeline_add_track (timeline, trackv);
+
+  const gchar * capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
+  GstCaps * caps = gst_caps_from_string (capsstring);
+  gchar * capstring = gst_caps_to_string(caps);
+  g_print("caps: %s\n", capstring);
+  ges_track_set_restriction_caps(trackv, caps);
+
+  GESLayer *layer = ges_layer_new ();
+  ges_timeline_add_layer (timeline, layer);
+
+  asset = GES_ASSET (ges_uri_clip_asset_request_sync (
+                         path ("image/wallpaper720p.jpg"),
+                         error));
+
+  clip = ges_layer_add_asset (layer, asset,
+      0, 0, 2 * GST_SECOND, GES_TRACK_TYPE_VIDEO);
+
+  GESTrackElement* elem = ges_clip_find_track_element(clip, trackv, G_TYPE_NONE);
+
+  ges_track_element_set_child_properties (elem, "posx", 100, NULL);
+//  ges_track_element_set_child_properties (elem, "posy", 100, NULL);
+  ges_track_element_set_child_properties (elem, "width", 100, NULL);
+
+  GParamSpec ** props;
+  guint numprops;
+
+  props = ges_track_element_list_children_properties(elem, &numprops);
+
+  for (int i = 0; i < numprops; i++) {
+      g_print("prop: %s\n", props[i]->name);
+  }
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
 void playTests(void) {
     play(hdTL());
     play(musicTL());
@@ -286,6 +517,13 @@ void renderTests(void) {
     render(transitionTL(), "transition", PROFILE_AAC_H264_QUICKTIME);
 }
 
+void newTests(void) {
+  play(compTL());
+  play(volumeTestTL());
+  play(alphaTestTL());
+  play(pngTransparencyTL());
+}
+
 int
 main (int argc, char **argv)
 {
@@ -297,8 +535,9 @@ main (int argc, char **argv)
 
   init_path();
 
-  renderTests();
   formatTests();
+  renderTests();
+  newTests();
 
   return 0;
 }
