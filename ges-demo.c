@@ -473,10 +473,10 @@ void renderTests(void) {
 }
 
 void newTests(void) {
-  ges_renderer_play(compTL());
-  ges_renderer_play(volumeTestTL());
-  ges_renderer_play(alphaTestTL());
-  ges_renderer_play(pngTransparencyTL());
+  ges_renderer_render_pal(compTL(), "compTL", PROFILE_AAC_H264_QUICKTIME);
+  ges_renderer_render_pal(volumeTestTL(), "volumeTestTL", PROFILE_AAC_H264_QUICKTIME);
+  ges_renderer_render_pal(alphaTestTL(), "alphaTestTL", PROFILE_AAC_H264_QUICKTIME);
+  ges_renderer_render_pal(videoTransparencyTL(), "videoTransparencyTL", PROFILE_AAC_H264_QUICKTIME);
 }
 
 int
