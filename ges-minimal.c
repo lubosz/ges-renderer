@@ -14,8 +14,8 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
       gchar *dbg_info = NULL;
 
       gst_message_parse_error (message, &err, &dbg_info);
-      g_printerr ("\n\nERROR from element %s: %s\n", GST_OBJECT_NAME (message->src),
-          err->message);
+      g_printerr ("\n\nERROR from element %s: %s\n",
+          GST_OBJECT_NAME (message->src), err->message);
       g_printerr ("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
       g_error_free (err);
       g_free (dbg_info);
@@ -36,7 +36,7 @@ int
 main (int argc, char **argv)
 {
 #ifdef PLATTFORM_WINDOWS
-    LoadLibrary("exchndl.dll");
+  LoadLibrary ("exchndl.dll");
 #endif
 
   GESTimeline *timeline;
@@ -62,7 +62,7 @@ main (int argc, char **argv)
   gst_object_unref (asset);
 
   ges_timeline_commit (timeline);
-  
+
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 

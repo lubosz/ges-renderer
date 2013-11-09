@@ -14,32 +14,38 @@ static GESPipeline *pipeline = NULL;
 static GstClockTime duration;
 static gboolean wasError = FALSE;
 
-char *replace(char *s, char old, char replacement) {
-    char *p = s;
+char *
+replace (char *s, char old, char replacement)
+{
+  char *p = s;
 
-    while(*p) {
-        if(*p == old)
-            *p = replacement;
-        ++p;
-    }
-    return s;
+  while (*p) {
+    if (*p == old)
+      *p = replacement;
+    ++p;
+  }
+  return s;
 }
 
-void ges_renderer_init(void) {
-    duration = 0;
-    ges_renderer_init_path();
+void
+ges_renderer_init (void)
+{
+  duration = 0;
+  ges_renderer_init_path ();
 }
 
-void ges_renderer_init_path(void) {
-    duration = 0;
-    char directory[1024];
-    getcwd (directory, 1024);
-  #ifdef PLATTFORM_WINDOWS
-    char * replaced = replace (directory, '\\', '/');
-    data_path = g_strconcat ("file:///", replaced, "/data/", NULL);
-  #else
-    data_path = g_strconcat ("file://", &directory, "/data/", NULL);
-  #endif
+void
+ges_renderer_init_path (void)
+{
+  duration = 0;
+  char directory[1024];
+  getcwd (directory, 1024);
+#ifdef PLATTFORM_WINDOWS
+  char *replaced = replace (directory, '\\', '/');
+  data_path = g_strconcat ("file:///", replaced, "/data/", NULL);
+#else
+  data_path = g_strconcat ("file://", &directory, "/data/", NULL);
+#endif
 }
 
 char *
@@ -50,56 +56,66 @@ ges_renderer_get_absolute_path (const char *rel_path)
 
 
 
-gint ges_asset_get_structure_int(GESUriClipAsset * asset, const char * name) {
-    GstDiscovererInfo * info = ges_uri_clip_asset_get_info(asset);
-    GstDiscovererStreamInfo* stream_info = gst_discoverer_info_get_stream_info(info);
-    GstCaps* caps = gst_discoverer_stream_info_get_caps(stream_info);
-    GstStructure * structure = gst_caps_get_structure(caps, 0);
-    gint value;
-    gst_structure_get_int (structure, name, &value);
-    return value;
-}
-
-gint ges_asset_get_width(GESUriClipAsset * asset) {
-    return ges_asset_get_structure_int(asset, "width");
-}
-
-gint ges_asset_get_height(GESUriClipAsset *asset) {
-    return ges_asset_get_structure_int(asset, "height");
-}
-
-GESClip *
-ges_clip_unknown_from_rel_path (const gchar * path, GESLayer * layer, gint start, gint in, gint dur)
+gint
+ges_asset_get_structure_int (GESUriClipAsset * asset, const char *name)
 {
-  return ges_clip_from_rel_path (path, layer, start, in, dur, GES_TRACK_TYPE_UNKNOWN);
+  GstDiscovererInfo *info = ges_uri_clip_asset_get_info (asset);
+  GstDiscovererStreamInfo *stream_info =
+      gst_discoverer_info_get_stream_info (info);
+  GstCaps *caps = gst_discoverer_stream_info_get_caps (stream_info);
+  GstStructure *structure = gst_caps_get_structure (caps, 0);
+  gint value;
+  gst_structure_get_int (structure, name, &value);
+  return value;
 }
 
-GESClip *
-ges_clip_from_rel_path (const gchar * rel_path, GESLayer * layer, gint start, gint in, gint dur,
-    GESTrackType tt)
+gint
+ges_asset_get_width (GESUriClipAsset * asset)
 {
-  return ges_clip_from_path (ges_renderer_get_absolute_path(rel_path), layer, start, in, dur, tt);
+  return ges_asset_get_structure_int (asset, "width");
+}
+
+gint
+ges_asset_get_height (GESUriClipAsset * asset)
+{
+  return ges_asset_get_structure_int (asset, "height");
 }
 
 GESClip *
-ges_clip_from_path (const gchar * path, GESLayer * layer, gint start, gint in, gint dur,
-    GESTrackType tt)
+ges_clip_unknown_from_rel_path (const gchar * path, GESLayer * layer,
+    gint start, gint in, gint dur)
+{
+  return ges_clip_from_rel_path (path, layer, start, in, dur,
+      GES_TRACK_TYPE_UNKNOWN);
+}
+
+GESClip *
+ges_clip_from_rel_path (const gchar * rel_path, GESLayer * layer, gint start,
+    gint in, gint dur, GESTrackType tt)
+{
+  return ges_clip_from_path (ges_renderer_get_absolute_path (rel_path), layer,
+      start, in, dur, tt);
+}
+
+GESClip *
+ges_clip_from_path (const gchar * path, GESLayer * layer, gint start, gint in,
+    gint dur, GESTrackType tt)
 {
   GError **error = NULL;
-  GESUriClipAsset * asset;
-  GESClip * clip;
+  GESUriClipAsset *asset;
+  GESClip *clip;
 
   asset = ges_uri_clip_asset_request_sync (path, error);
 
-  guint width = ges_asset_get_width(asset);
-  guint height = ges_asset_get_height(asset);
+  guint width = ges_asset_get_width (asset);
+  guint height = ges_asset_get_height (asset);
 
-  g_print("Size %dx%d\n", width, height);
+  g_print ("Size %dx%d\n", width, height);
 
-  clip = ges_layer_add_asset (layer, GES_ASSET(asset),
+  clip = ges_layer_add_asset (layer, GES_ASSET (asset),
       start * GST_SECOND, in * GST_SECOND, dur * GST_SECOND, tt);
 
-  gst_object_unref(asset);
+  gst_object_unref (asset);
 
   return clip;
 }
@@ -115,8 +131,8 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
       gchar *dbg_info = NULL;
 
       gst_message_parse_error (message, &err, &dbg_info);
-      g_printerr ("\n\nERROR from element %s: %s\n", GST_OBJECT_NAME (message->src),
-          err->message);
+      g_printerr ("\n\nERROR from element %s: %s\n",
+          GST_OBJECT_NAME (message->src), err->message);
       g_printerr ("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
       g_error_free (err);
       g_free (dbg_info);
@@ -133,16 +149,18 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
   }
 }
 
-GstCaps * gst_caps_from_videosize(VideoSize * size) {
-    GstCaps *caps;
-    char capsstring[50];
-    sprintf (capsstring,
-        "video/x-raw,width=%d,height=%d,framerate=%d/1,format=I420",
-        size->width, size->height, size->fps);
+GstCaps *
+gst_caps_from_videosize (VideoSize * size)
+{
+  GstCaps *caps;
+  char capsstring[50];
+  sprintf (capsstring,
+      "video/x-raw,width=%d,height=%d,framerate=%d/1,format=I420",
+      size->width, size->height, size->fps);
 
-    caps = gst_caps_from_string (capsstring);
+  caps = gst_caps_from_string (capsstring);
 
-    return caps;
+  return caps;
 }
 
 GstEncodingProfile *
@@ -164,7 +182,7 @@ gst_encoding_profile_from_type (EncodingProfile type, VideoSize * size)
 
   caps = gst_caps_from_string (profiles[type][2]);
 
-  settings = gst_caps_from_videosize(size);
+  settings = gst_caps_from_videosize (size);
 
   gst_encoding_container_profile_add_profile (prof,
       (GstEncodingProfile *) gst_encoding_video_profile_new (caps, NULL,
@@ -230,8 +248,8 @@ ges_pipeline_from_timeline (GESTimeline * timeline)
 }
 
 void
-ges_renderer_run_job (GESTimeline * timeline, const gchar * name, EncodingProfile prof,
-    VideoSize * size)
+ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
+    EncodingProfile prof, VideoSize * size)
 {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
@@ -250,7 +268,7 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name, EncodingProfil
   g_signal_connect (bus, "message", (GCallback) bus_message_cb, mainloop);
   g_timeout_add (100, (GSourceFunc) ges_renderer_print_progress, NULL);
   gst_bus_add_signal_watch (bus);
-  gst_object_unref(bus);
+  gst_object_unref (bus);
 
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 
@@ -259,7 +277,7 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name, EncodingProfil
 
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 
-  gst_object_unref(pipeline);
+  gst_object_unref (pipeline);
 }
 
 void
@@ -270,7 +288,8 @@ ges_renderer_play (GESTimeline * timeline)
 }
 
 void
-ges_renderer_render_pal (GESTimeline * timeline, const gchar * name, EncodingProfile prof)
+ges_renderer_render_pal (GESTimeline * timeline, const gchar * name,
+    EncodingProfile prof)
 {
   VideoSize pal = { 720, 576, 25 };
   ges_renderer_render (timeline, name, prof, &pal);
@@ -289,38 +308,42 @@ ges_renderer_render (GESTimeline * timeline, const gchar * name,
   float dur = then - now;
   g_print ("\n====\n");
 
-  const gchar * exitStatus = "Rendering";
+  const gchar *exitStatus = "Rendering";
   if (wasError)
-      exitStatus = "Error";
+    exitStatus = "Error";
 
   g_print ("%s took %.2fs\n", exitStatus, dur);
   g_print ("====\n");
 }
 
-GESTimeline * ges_timeline_new_pal(void) {
-    GESTimeline *timeline;
-    VideoSize pal = { 720, 576, 25 };
-    timeline = ges_timeline_audio_video_from_videosize(&pal);
-    return timeline;
+GESTimeline *
+ges_timeline_new_pal (void)
+{
+  GESTimeline *timeline;
+  VideoSize pal = { 720, 576, 25 };
+  timeline = ges_timeline_audio_video_from_videosize (&pal);
+  return timeline;
 }
 
-GESTimeline * ges_timeline_audio_video_from_videosize(VideoSize * size) {
-    GESTimeline *timeline;
-    GESTrack *tracka, *trackv;
-    timeline = ges_timeline_new ();
+GESTimeline *
+ges_timeline_audio_video_from_videosize (VideoSize * size)
+{
+  GESTimeline *timeline;
+  GESTrack *tracka, *trackv;
+  timeline = ges_timeline_new ();
 
-    tracka = GES_TRACK (ges_audio_track_new ());
-    trackv = GES_TRACK (ges_video_track_new ());
+  tracka = GES_TRACK (ges_audio_track_new ());
+  trackv = GES_TRACK (ges_video_track_new ());
 
-    if (!ges_timeline_add_track (timeline, trackv) ||
-        !ges_timeline_add_track (timeline, tracka)) {
-      gst_object_unref (timeline);
-      timeline = NULL;
-    }
+  if (!ges_timeline_add_track (timeline, trackv) ||
+      !ges_timeline_add_track (timeline, tracka)) {
+    gst_object_unref (timeline);
+    timeline = NULL;
+  }
 
-    GstCaps * caps = gst_caps_from_videosize(size);
+  GstCaps *caps = gst_caps_from_videosize (size);
 
-    ges_track_set_restriction_caps(trackv, caps);
+  ges_track_set_restriction_caps (trackv, caps);
 
-    return timeline;
+  return timeline;
 }

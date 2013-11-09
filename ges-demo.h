@@ -20,17 +20,17 @@ GESTimeline *minuteTL (void);
 GESTimeline *imageTL (void);
 GESTimeline *musicTL (void);
 GESTimeline *hdTL (void);
-GESTimeline * transitionTL (void);
-GESTimeline * overlayTL (void);
-GESTimeline * videoTransparencyTL (void);
-GESTimeline * volumeTestTL (void);
-GESTimeline * positionTestTL (void);
-GESTimeline * alphaTestTL (void);
-GESTimeline * compTL (void);
+GESTimeline *transitionTL (void);
+GESTimeline *overlayTL (void);
+GESTimeline *videoTransparencyTL (void);
+GESTimeline *volumeTestTL (void);
+GESTimeline *positionTestTL (void);
+GESTimeline *alphaTestTL (void);
+GESTimeline *compTL (void);
 
-void playTests(void);
-void formatTests(void);
-void renderTests(void);
-void newTests(void);
+void playTests (void);
+void formatTests (void);
+void renderTests (void);
+void newTests (void);
 
 #endif // GESDEMO_H

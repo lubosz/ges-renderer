@@ -1,8 +1,8 @@
 #include <ges/ges.h>
 #include <stdio.h>
 
-GstCaps * gst_caps_from_videosize(int w, int h, int fps);
-GstEncodingProfile * gst_encoding_profile_from_type (GstCaps * settings);
+GstCaps *gst_caps_from_videosize (int w, int h, int fps);
+GstEncodingProfile *gst_encoding_profile_from_type (GstCaps * settings);
 gboolean ges_renderer_print_progress (void);
 void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
@@ -10,25 +10,26 @@ static GstClockTime duration;
 GESPipeline *pipeline;
 
 static const char *const profile[4] = {
-    "video/quicktime,variant=iso",
-    "video/x-h264",
-    "audio/mpeg,mpegversion=1,layer=3"
+  "video/quicktime,variant=iso",
+  "video/x-h264",
+  "audio/mpeg,mpegversion=1,layer=3"
 };
 
-GstCaps * gst_caps_from_videosize(int w, int h, int fps) {
-    GstCaps *caps;
-    char capsstring[50];
-    sprintf (capsstring,
-        "video/x-raw,width=%d,height=%d,framerate=%d/1",
-        w, h, fps);
+GstCaps *
+gst_caps_from_videosize (int w, int h, int fps)
+{
+  GstCaps *caps;
+  char capsstring[50];
+  sprintf (capsstring,
+      "video/x-raw,width=%d,height=%d,framerate=%d/1", w, h, fps);
 
-    caps = gst_caps_from_string (capsstring);
+  caps = gst_caps_from_string (capsstring);
 
-    return caps;
+  return caps;
 }
 
 GstEncodingProfile *
-gst_encoding_profile_from_type (GstCaps *settings)
+gst_encoding_profile_from_type (GstCaps * settings)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
@@ -86,8 +87,8 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
       gchar *dbg_info = NULL;
 
       gst_message_parse_error (message, &err, &dbg_info);
-      g_printerr ("\n\nERROR from element %s: %s\n", GST_OBJECT_NAME (message->src),
-          err->message);
+      g_printerr ("\n\nERROR from element %s: %s\n",
+          GST_OBJECT_NAME (message->src), err->message);
       g_printerr ("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
       g_error_free (err);
       g_free (dbg_info);
@@ -111,8 +112,10 @@ main (int argc, char **argv)
   GESLayer *layer;
   GError **error = NULL;
   GESAsset *asset;
-  const gchar * url = "file:///home/bmonkey/workspace/ges/ges-demos/data/sd/sintel_trailer-480p.mp4";
-  const gchar *exportURL = "file:///home/bmonkey/workspace/ges/ges-demos/transition.mp4";
+  const gchar *url =
+      "file:///home/bmonkey/workspace/ges/ges-demos/data/sd/sintel_trailer-480p.mp4";
+  const gchar *exportURL =
+      "file:///home/bmonkey/workspace/ges/ges-demos/transition.mp4";
 
   gst_init (&argc, &argv);
   ges_init ();
@@ -136,11 +139,11 @@ main (int argc, char **argv)
   ges_timeline_commit (timeline);
 
   duration = ges_timeline_get_duration (timeline);
-  
+
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 
-  GstCaps* settings = gst_caps_from_videosize(720, 576, 25);
+  GstCaps *settings = gst_caps_from_videosize (720, 576, 25);
   GstEncodingProfile *profile = gst_encoding_profile_from_type (settings);
   ges_pipeline_set_render_settings (pipeline, exportURL, profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
