@@ -45,17 +45,7 @@ testPatternTL (void)
   ges_layer_add_clip (layer, GES_CLIP (srca));
   ges_layer_add_clip (layer, GES_CLIP (srcb));
 
-  /*
-   * Non auto transition
-   *
-     tr = ges_transition_clip_new_for_nick ("crossfade");
-     g_object_set (tr,
-     "start", tdur * GST_SECOND,
-     "duration", tst * GST_SECOND, 
-     "in-point", 0, 
-     NULL);
-     ges_layer_add_clip (layer1, GES_CLIP (tr));
-   */
+
   ges_timeline_commit (timeline);
 
   return timeline;
@@ -283,7 +273,6 @@ pngTransparencyTL (void)
   g_object_set (layer1, "priority", 0, NULL);
 
   ges_clip_from_rel_path ("transparent/bokeeh.mov", layer1, 0, 0, 10, GES_TRACK_TYPE_VIDEO);
-//  placeAssetType (layer1, path ("image/Fish.png"), 0, 0, 10, GES_TRACK_TYPE_VIDEO);
 
   GESLayer *layer2 = ges_layer_new ();
   ges_timeline_add_layer (timeline, layer2);
@@ -329,11 +318,7 @@ alphaTestTL (void)
 
   GESTrackElement* elem = ges_clip_find_track_element(png, trackv, G_TYPE_NONE);
 
-  GValue a = G_VALUE_INIT;
-  g_value_init (&a, G_TYPE_DOUBLE);
-  g_value_set_double (&a, 0.5);
-
-  ges_track_element_set_child_property (elem, "alpha", &a);
+  ges_track_element_set_child_properties (elem, "alpha", 0.5, NULL);
 
   ges_clip_from_rel_path ("hd/fluidsimulation.mp4", layer2, 0, 20, 10,
       GES_TRACK_TYPE_VIDEO);
@@ -373,11 +358,7 @@ volumeTestTL (void)
 
   GESTrackElement* elem = ges_clip_find_track_element(music1, tracka, G_TYPE_NONE);
 
-  GValue vol = G_VALUE_INIT;
-  g_value_init (&vol, G_TYPE_DOUBLE);
-  g_value_set_double (&vol, 0.1);
-
-  ges_track_element_set_child_property (elem, "volume", &vol);
+  ges_track_element_set_child_properties (elem, "volume", 2.1, NULL);
 
   ges_timeline_commit (timeline);
 
@@ -470,18 +451,7 @@ GESTimeline * positionTestTL (void)
 
   GESTrackElement* elem = ges_clip_find_track_element(clip, trackv, G_TYPE_NONE);
 
-  ges_track_element_set_child_properties (elem, "posx", 100, NULL);
-//  ges_track_element_set_child_properties (elem, "posy", 100, NULL);
-  ges_track_element_set_child_properties (elem, "width", 100, NULL);
-
-  GParamSpec ** props;
-  guint numprops;
-
-  props = ges_track_element_list_children_properties(elem, &numprops);
-
-  for (int i = 0; i < numprops; i++) {
-      g_print("prop: %s\n", props[i]->name);
-  }
+  ges_track_element_set_child_properties (elem, "posx", 100, "width", 100, NULL);
 
   ges_timeline_commit (timeline);
 
