@@ -177,7 +177,7 @@ hdTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  VideoSize hd = { 1280, 720, 30 };
+  GESRendererProfile hd = { 1280, 720, 30 };
   timeline = ges_timeline_audio_video_from_videosize (&hd);
   layer = ges_layer_new ();
 
@@ -307,8 +307,8 @@ alphaTestTL (void)
     timeline = NULL;
   }
 
-  VideoSize pal = { 720, 576, 25 };
-  GstCaps *caps = gst_caps_from_videosize (&pal);
+  GESRendererProfile pal = { 720, 576, 25 };
+  GstCaps *caps = gst_caps_from_renderer_profile (&pal);
   ges_track_set_restriction_caps (trackv, caps);
 
   GESLayer *layer1 = ges_layer_new ();
@@ -416,8 +416,8 @@ compTL (void)
         ges_clip_find_track_element (vieh, trackv, G_TYPE_NONE);
 
     ges_track_element_set_child_properties (elem,
-        "posx", i * 100,
-        "posy", i * 100, "width", i * 100, "height", i * 100, NULL);
+        "posx", i * 100, "posy", i * 100,
+        "width", i * 100, "height", i * 100, NULL);
   }
 
   GESLayer *backgroud_layer = ges_layer_new ();
@@ -496,27 +496,26 @@ formatTests (void)
 void
 renderTests (void)
 {
-  ges_renderer_render_pal (effectTL (), "effect", PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (minuteTL (), "1minute", PROFILE_AAC_H264_QUICKTIME);
+  GESRendererProfile hd = { 1280, 720, 30, PROFILE_AAC_H264_QUICKTIME };
+  GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
 
-  VideoSize hd = { 1280, 720, 30 };
-  ges_renderer_render (hdTL (), "hd", PROFILE_AAC_H264_QUICKTIME, &hd);
-  ges_renderer_render_pal (musicTL (), "audio", PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (imageTL (), "image", PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (transitionTL (), "transition",
-      PROFILE_AAC_H264_QUICKTIME);
+  ges_renderer_render (effectTL (), "effect", &pal);
+  ges_renderer_render (minuteTL (), "1minute", &pal);
+  ges_renderer_render (hdTL (), "hd", &hd);
+  ges_renderer_render (musicTL (), "audio", &pal);
+  ges_renderer_render (imageTL (), "image", &pal);
+  ges_renderer_render (transitionTL (), "transition", &pal);
 }
 
 void
 newTests (void)
 {
-  ges_renderer_render_pal (compTL (), "compTL", PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (volumeTestTL (), "volumeTestTL",
-      PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (alphaTestTL (), "alphaTestTL",
-      PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (videoTransparencyTL (), "videoTransparencyTL",
-      PROFILE_AAC_H264_QUICKTIME);
+  GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
+
+  ges_renderer_render (compTL (), "compTL", &pal);
+  ges_renderer_render (volumeTestTL (), "volumeTestTL", &pal);
+  ges_renderer_render (alphaTestTL (), "alphaTestTL", &pal);
+  ges_renderer_render (videoTransparencyTL (), "videoTransparencyTL", &pal);
 }
 
 int

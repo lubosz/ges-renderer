@@ -121,7 +121,7 @@ render_json (JsonNode * root)
 
   g_print ("Resolution: %dx%d, FPS: %d\n", width, height, fps);
 
-  VideoSize res = { width, height, fps };
+  GESRendererProfile res = { width, height, fps };
   jsonTimeline = ges_timeline_audio_video_from_videosize (&res);
 
   // videos
@@ -154,7 +154,8 @@ render_json (JsonNode * root)
     } else if (strcmp (format, "ogg") == 0) {
       prof = PROFILE_VORBIS_THEORA_OGG;
     }
-    ges_renderer_render (jsonTimeline, name, prof, &res);
+    res.profile = prof;
+    ges_renderer_render (jsonTimeline, name, &res);
   }
   json_reader_end_member (reader);
 

@@ -32,12 +32,13 @@ typedef enum
   PROFILE_VORBIS_H264_MATROSKA
 } EncodingProfile;
 
-typedef struct VideoSize VideoSize;
-struct VideoSize
+typedef struct GESRendererProfile GESRendererProfile;
+struct GESRendererProfile
 {
   gint width;
   gint height;
   gint fps;
+  EncodingProfile profile;
 };
 
 char *ges_renderer_get_absolute_path (const char *rel_path);
@@ -52,30 +53,32 @@ GESClip *ges_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
 
 void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
-GstEncodingProfile *gst_encoding_profile_from_type (EncodingProfile type,
-    VideoSize * size);
+GstEncodingProfile *ges_renderer_profile_get_encoding_profile (
+    GESRendererProfile * profile);
 
 gboolean ges_renderer_print_progress (void);
 
-void ges_pipeline_setup_rendering (GESPipeline * pipeline, EncodingProfile prof,
-    const gchar * name, VideoSize * size);
+void ges_pipeline_setup_rendering (GESPipeline * pipeline,
+    const gchar * name, GESRendererProfile * profile);
 
 GESPipeline *ges_pipeline_from_timeline (GESTimeline * timeline);
 void ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
-    EncodingProfile prof, VideoSize * size);
+    GESRendererProfile * profile);
 
 void ges_renderer_play (GESTimeline * timeline);
 void ges_renderer_render_pal (GESTimeline * timeline, const gchar * name,
-    EncodingProfile prof);
+    EncodingProfile profile);
 void ges_renderer_render (GESTimeline * timeline, const gchar * name,
-    EncodingProfile prof, VideoSize * size);
+    GESRendererProfile * profile);
+
+void ges_renderer_profile_print(GESRendererProfile * profile);
 
 void ges_renderer_init_path (void);
 
-GstCaps *gst_caps_from_videosize (VideoSize * size);
+GstCaps *gst_caps_from_renderer_profile (GESRendererProfile * profile);
 
 GESTimeline *ges_timeline_new_pal (void);
-GESTimeline *ges_timeline_audio_video_from_videosize (VideoSize * size);
+GESTimeline *ges_timeline_audio_video_from_videosize (GESRendererProfile * profile);
 
 gint ges_asset_get_structure_int (GESUriClipAsset * asset, const char *name);
 gint ges_asset_get_width (GESUriClipAsset * asset);

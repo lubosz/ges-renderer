@@ -1,8 +1,9 @@
 #include <ges/ges.h>
 #include <stdio.h>
 
-GstCaps *gst_caps_from_videosize (int w, int h, int fps);
-GstEncodingProfile *gst_encoding_profile_from_type (GstCaps * settings);
+GstCaps *gst_caps_from_renderer_profile (int w, int h, int fps);
+GstEncodingProfile *ges_renderer_profile_get_encoding_profile (GstCaps *
+    settings);
 gboolean ges_renderer_print_progress (void);
 void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
@@ -16,7 +17,7 @@ static const char *const profile[4] = {
 };
 
 GstCaps *
-gst_caps_from_videosize (int w, int h, int fps)
+gst_caps_from_renderer_profile (int w, int h, int fps)
 {
   GstCaps *caps;
   char capsstring[50];
@@ -29,7 +30,7 @@ gst_caps_from_videosize (int w, int h, int fps)
 }
 
 GstEncodingProfile *
-gst_encoding_profile_from_type (GstCaps * settings)
+ges_renderer_profile_get_encoding_profile (GstCaps * settings)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
@@ -143,8 +144,9 @@ main (int argc, char **argv)
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 
-  GstCaps *settings = gst_caps_from_videosize (720, 576, 25);
-  GstEncodingProfile *profile = gst_encoding_profile_from_type (settings);
+  GstCaps *settings = gst_caps_from_renderer_profile (720, 576, 25);
+  GstEncodingProfile *profile =
+      ges_renderer_profile_get_encoding_profile (settings);
   ges_pipeline_set_render_settings (pipeline, exportURL, profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 

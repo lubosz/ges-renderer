@@ -150,29 +150,37 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
 }
 
 GstCaps *
-gst_caps_from_videosize (VideoSize * size)
+gst_caps_from_renderer_profile (GESRendererProfile * profile)
 {
   GstCaps *caps;
   char capsstring[50];
   sprintf (capsstring,
       "video/x-raw,width=%d,height=%d,framerate=%d/1,format=I420",
-      size->width, size->height, size->fps);
+      profile->width, profile->height, profile->fps);
 
   caps = gst_caps_from_string (capsstring);
 
   return caps;
 }
 
+void
+ges_renderer_profile_print (GESRendererProfile * profile)
+{
+  EncodingProfile type = profile->profile;
+  g_print ("Format: %s\n  Container: %s\n  Video:     %s \n  Audio:     %s\n",
+      profiles[type][3],
+      profiles[type][0], profiles[type][2], profiles[type][1]);
+}
+
 GstEncodingProfile *
-gst_encoding_profile_from_type (EncodingProfile type, VideoSize * size)
+ges_renderer_profile_get_encoding_profile (GESRendererProfile * profile)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
   GstCaps *settings;
+  EncodingProfile type = profile->profile;
 
-  g_print ("Format: %s\n  Container: %s\n  Video:     %s \n  Audio:     %s\n",
-      profiles[type][3],
-      profiles[type][0], profiles[type][2], profiles[type][1]);
+  ges_renderer_profile_print (profile);
 
   caps = gst_caps_from_string (profiles[type][0]);
   prof =
@@ -182,7 +190,7 @@ gst_encoding_profile_from_type (EncodingProfile type, VideoSize * size)
 
   caps = gst_caps_from_string (profiles[type][2]);
 
-  settings = gst_caps_from_videosize (size);
+  settings = gst_caps_from_renderer_profile (profile);
 
   gst_encoding_container_profile_add_profile (prof,
       (GstEncodingProfile *) gst_encoding_video_profile_new (caps, NULL,
@@ -223,15 +231,18 @@ ges_renderer_print_progress (void)
 }
 
 void
-ges_pipeline_setup_rendering (GESPipeline * pipeline, EncodingProfile prof,
-    const gchar * name, VideoSize * size)
+ges_pipeline_setup_rendering (GESPipeline * pipeline,
+    const gchar * name, GESRendererProfile * profile)
 {
+  EncodingProfile type = profile->profile;
+
   gchar *fileName =
-      g_strconcat (data_path, "export/", name, ".", profiles[prof][3], NULL);
+      g_strconcat (data_path, "export/", name, ".", profiles[type][3], NULL);
   g_print ("Rendering %s\n", fileName);
 
-  GstEncodingProfile *profile = gst_encoding_profile_from_type (prof, size);
-  ges_pipeline_set_render_settings (pipeline, fileName, profile);
+  GstEncodingProfile *gst_profile =
+      ges_renderer_profile_get_encoding_profile (profile);
+  ges_pipeline_set_render_settings (pipeline, fileName, gst_profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 }
 
@@ -249,7 +260,7 @@ ges_pipeline_from_timeline (GESTimeline * timeline)
 
 void
 ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
-    EncodingProfile prof, VideoSize * size)
+    GESRendererProfile * profile)
 {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
@@ -257,7 +268,7 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
   pipeline = ges_pipeline_from_timeline (timeline);
 
   if (name != NULL) {
-    ges_pipeline_setup_rendering (pipeline, prof, name, size);
+    ges_pipeline_setup_rendering (pipeline, name, profile);
   } else {
     ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
     g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit, mainloop);
@@ -284,25 +295,26 @@ void
 ges_renderer_play (GESTimeline * timeline)
 {
   gchar *name = NULL;
-  ges_renderer_run_job (timeline, name, PROFILE_NONE, NULL);
+  GESRendererProfile profile = { 0, 0, 0, PROFILE_NONE };
+  ges_renderer_run_job (timeline, name, &profile);
 }
 
 void
 ges_renderer_render_pal (GESTimeline * timeline, const gchar * name,
-    EncodingProfile prof)
+    EncodingProfile profile)
 {
-  VideoSize pal = { 720, 576, 25 };
-  ges_renderer_render (timeline, name, prof, &pal);
+  GESRendererProfile pal = { 720, 576, 25, profile };
+  ges_renderer_render (timeline, name, &pal);
 }
 
 void
 ges_renderer_render (GESTimeline * timeline, const gchar * name,
-    EncodingProfile prof, VideoSize * size)
+    GESRendererProfile * profile)
 {
   g_print ("\n====\n");
   float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
 
-  ges_renderer_run_job (timeline, name, prof, size);
+  ges_renderer_run_job (timeline, name, profile);
 
   float then = (float) g_get_monotonic_time () / (float) GST_MSECOND;
   float dur = then - now;
@@ -320,13 +332,13 @@ GESTimeline *
 ges_timeline_new_pal (void)
 {
   GESTimeline *timeline;
-  VideoSize pal = { 720, 576, 25 };
+  GESRendererProfile pal = { 720, 576, 25 };
   timeline = ges_timeline_audio_video_from_videosize (&pal);
   return timeline;
 }
 
 GESTimeline *
-ges_timeline_audio_video_from_videosize (VideoSize * size)
+ges_timeline_audio_video_from_videosize (GESRendererProfile * profile)
 {
   GESTimeline *timeline;
   GESTrack *tracka, *trackv;
@@ -341,7 +353,7 @@ ges_timeline_audio_video_from_videosize (VideoSize * size)
     timeline = NULL;
   }
 
-  GstCaps *caps = gst_caps_from_videosize (size);
+  GstCaps *caps = gst_caps_from_renderer_profile (profile);
 
   ges_track_set_restriction_caps (trackv, caps);
 
