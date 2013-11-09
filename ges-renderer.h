@@ -76,4 +76,8 @@ GstCaps * makeCaps(VideoSize *size);
 GESTimeline * palTimeline(void);
 GESTimeline * newTimeline(VideoSize * size);
 
+guint ges_asset_get_structure_int(GESUriClipAsset * asset, const char * name);
+guint ges_asset_get_width(GESUriClipAsset *asset);
+guint ges_asset_get_height(GESUriClipAsset * asset);
+
 #endif // GES_RENDERER_H

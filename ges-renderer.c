@@ -54,17 +54,41 @@ placeAsset (GESLayer * layer, gchar * path, gint start, gint in, gint dur)
   return placeAssetType (layer, path, start, in, dur, GES_TRACK_TYPE_UNKNOWN);
 }
 
+
+guint ges_asset_get_structure_int(GESUriClipAsset * asset, const char * name) {
+    GstDiscovererInfo * info = ges_uri_clip_asset_get_info(asset);
+    GstDiscovererStreamInfo* stream_info = gst_discoverer_info_get_stream_info(info);
+    GstCaps* caps = gst_discoverer_stream_info_get_caps(stream_info);
+    GstStructure * structure = gst_caps_get_structure(caps, 0);
+    int value;
+    gst_structure_get_int (structure, name, &value);
+    return value;
+}
+
+guint ges_asset_get_width(GESUriClipAsset * asset) {
+    return ges_asset_get_structure_int(asset, "width");
+}
+
+guint ges_asset_get_height(GESUriClipAsset *asset) {
+    return ges_asset_get_structure_int(asset, "height");
+}
+
 GESClip *
 placeAssetType (GESLayer * layer, gchar * path, gint start, gint in, gint dur,
     GESTrackType tt)
 {
   GError **error = NULL;
-  GESAsset *asset;
+  GESUriClipAsset * asset;
   GESClip * clip;
 
-  asset = GES_ASSET (ges_uri_clip_asset_request_sync (path, error));
+  asset = ges_uri_clip_asset_request_sync (path, error);
 
-  clip = ges_layer_add_asset (layer, asset,
+  guint width = ges_asset_get_width(asset);
+  guint height = ges_asset_get_height(asset);
+
+  g_print("Size %dx%d\n", width, height);
+
+  clip = ges_layer_add_asset (layer, GES_ASSET(asset),
       start * GST_SECOND, in * GST_SECOND, dur * GST_SECOND, tt);
 
   gst_object_unref(asset);
