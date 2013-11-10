@@ -63,15 +63,18 @@ effectTL (void)
   ges_timeline_add_layer (timeline, layer);
 
   clip1 =
-      ges_clip_unknown_from_rel_path ("sd/trailer_400p.ogg", layer, 0, 0, 10);
+      ges_clip_unknown_from_rel_path ("sd/trailer_400p.ogg", layer, 0, 0, 5);
   clip2 =
-      ges_clip_unknown_from_rel_path ("sd/sintel_trailer-480p.ogv", layer, 10,
-      5, 10);
+      ges_clip_unknown_from_rel_path ("sd/sintel_trailer-480p.ogv", layer, 5,
+      5, 5);
 
   effect1 = ges_effect_new ("agingtv");
   ges_container_add (GES_CONTAINER (clip1), GES_TIMELINE_ELEMENT (effect1));
 
   effect2 = ges_effect_new ("rippletv");
+//  some cool Frei0r plugins
+//  "frei0r-filter-pixeliz0r", "frei0r-filter-flippo", "frei0r-filter-twolay0r"
+
   ges_container_add (GES_CONTAINER (clip2), GES_TIMELINE_ELEMENT (effect2));
 
   ges_timeline_commit (timeline);
