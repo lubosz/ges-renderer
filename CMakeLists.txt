@@ -34,10 +34,14 @@ set(LIBS gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0)
 if( WIN32 )
   add_definitions( -DPLATTFORM_WINDOWS )
   set (LIBS ${LIBS} Kernel32.dll)
-  set(OS_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
+  #set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../../dist/windows_x86_64)
+  set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64)
+  
 else()
   set(OS_PREFIX /usr)
 endif()
+
+message("OS Prefix ${OS_PREFIX}")
 
 include_directories(
   ${OS_PREFIX}/include/gstreamer-1.0
@@ -60,6 +64,9 @@ foreach(TEST_PATH ${GLOB_TESTS})
     add_executable(${TEST_NAME} ${TEST_PATH} src/ges-renderer.c)
     target_link_libraries(${TEST_NAME} ${LIBS})
 endforeach(TEST_PATH)
+
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH /c/Users/Lubosz/cerbero/dist/windows_x86_64/bin)
 
 #install
 set(BINPERMISSIONS PERMISSIONS
