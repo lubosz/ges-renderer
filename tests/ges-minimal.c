@@ -3,10 +3,10 @@
 #endif
 #include <ges/ges.h>
 
-void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
+void message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
 void
-bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
+message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
 {
   switch (GST_MESSAGE_TYPE (message)) {
     case GST_MESSAGE_ERROR:{
@@ -69,7 +69,7 @@ main (int argc, char **argv)
   mainloop = g_main_loop_new (NULL, FALSE);
 
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline));
-  g_signal_connect (bus, "message", (GCallback) bus_message_cb, mainloop);
+  g_signal_connect (bus, "message", (GCallback) message_cb, mainloop);
   gst_bus_add_signal_watch (bus);
   gst_object_unref (bus);
 

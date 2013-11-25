@@ -1,11 +1,8 @@
 #include <ges/ges.h>
+#include "ges-renderer.h"
 #include <stdio.h>
 
-GstCaps *gst_caps_from_renderer_profile (int w, int h, int fps);
-GstEncodingProfile *ges_renderer_profile_get_encoding_profile (GstCaps *
-    settings);
-gboolean ges_renderer_print_progress (void);
-void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
+GstEncodingProfile *profile_get_encoding_profile (GstCaps * settings);
 
 static GstClockTime duration;
 GESPipeline *pipeline;
@@ -16,21 +13,8 @@ static const char *const profile[4] = {
   "audio/mpeg,mpegversion=1,layer=3"
 };
 
-GstCaps *
-gst_caps_from_renderer_profile (int w, int h, int fps)
-{
-  GstCaps *caps;
-  char capsstring[50];
-  sprintf (capsstring,
-      "video/x-raw,width=%d,height=%d,framerate=%d/1", w, h, fps);
-
-  caps = gst_caps_from_string (capsstring);
-
-  return caps;
-}
-
 GstEncodingProfile *
-ges_renderer_profile_get_encoding_profile (GstCaps * settings)
+profile_get_encoding_profile (GstCaps * settings)
 {
   GstEncodingContainerProfile *prof;
   GstCaps *caps;
@@ -58,52 +42,6 @@ ges_renderer_profile_get_encoding_profile (GstCaps * settings)
   gst_caps_unref (settings);
 
   return (GstEncodingProfile *) prof;
-}
-
-gboolean
-ges_renderer_print_progress (void)
-{
-  gint64 position;
-
-  gst_element_query_position (GST_ELEMENT (pipeline),
-      GST_FORMAT_TIME, &position);
-
-  float percent = (float) position * 100 / (float) duration;
-
-  float positionSec = (float) position / GST_SECOND;
-  float durationSec = (float) duration / GST_SECOND;
-
-  if (position > 0)
-    g_print ("\r%.2f%% %.2f/%.2fs", percent, positionSec, durationSec);
-
-  return TRUE;
-}
-
-void
-bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
-{
-  switch (GST_MESSAGE_TYPE (message)) {
-    case GST_MESSAGE_ERROR:{
-      GError *err = NULL;
-      gchar *dbg_info = NULL;
-
-      gst_message_parse_error (message, &err, &dbg_info);
-      g_printerr ("\n\nERROR from element %s: %s\n",
-          GST_OBJECT_NAME (message->src), err->message);
-      g_printerr ("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
-      g_error_free (err);
-      g_free (dbg_info);
-      g_main_loop_quit (mainloop);
-      break;
-    }
-    case GST_MESSAGE_EOS:{
-      g_print ("\nDone\n");
-      g_main_loop_quit (mainloop);
-      break;
-    }
-    default:
-      break;
-  }
 }
 
 int
@@ -144,9 +82,9 @@ main (int argc, char **argv)
   pipeline = ges_pipeline_new ();
   ges_pipeline_add_timeline (pipeline, timeline);
 
-  GstCaps *settings = gst_caps_from_renderer_profile (720, 576, 25);
-  GstEncodingProfile *profile =
-      ges_renderer_profile_get_encoding_profile (settings);
+  GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
+  GstCaps *settings = gst_caps_from_renderer_profile (&pal);
+  GstEncodingProfile *profile = profile_get_encoding_profile (settings);
   ges_pipeline_set_render_settings (pipeline, exportURL, profile);
   ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
 

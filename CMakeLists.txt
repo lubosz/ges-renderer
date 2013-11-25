@@ -44,17 +44,22 @@ include_directories(
   ${OS_PREFIX}/include/glib-2.0
   ${OS_PREFIX}/lib/glib-2.0/include
   ${OS_PREFIX}/include/json-glib-1.0
+  ${CMAKE_SOURCE_DIR}/src
 )
 
-add_executable(ges-demo ges-demo.c ges-renderer.c)
-add_executable(ges-minimal ges-minimal.c)
-add_executable(ges-json ges-json.c ges-renderer.c)
-add_executable(ges-minimal-transition ges-minimal-transition.c)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
-target_link_libraries(ges-demo ${LIBS})
-target_link_libraries(ges-minimal ${LIBS})
+add_executable(ges-json src/ges-json.c src/ges-renderer.c)
+
 target_link_libraries(ges-json ${LIBS} json-glib-1.0)
-target_link_libraries(ges-minimal-transition ${LIBS})
+
+file(GLOB_RECURSE GLOB_TESTS tests/*.c)
+foreach(TEST_PATH ${GLOB_TESTS})
+    string(REGEX REPLACE "\\.c" "" TEST_NAME "${TEST_PATH}")
+    string(REGEX REPLACE "^.*/([^/]*)\$" "\\1" TEST_NAME "${TEST_NAME}")
+    add_executable(${TEST_NAME} ${TEST_PATH} src/ges-renderer.c)
+    target_link_libraries(${TEST_NAME} ${LIBS})
+endforeach(TEST_PATH)
 
 #install
 set(BINPERMISSIONS PERMISSIONS
@@ -64,17 +69,15 @@ set(BINPERMISSIONS PERMISSIONS
 
 if( WIN32 )
   set (INSTALL_BINARIES
-	  ${CMAKE_SOURCE_DIR}/ges-demo.exe
-	  ${CMAKE_SOURCE_DIR}/ges-minimal.exe
-	  ${CMAKE_SOURCE_DIR}/ges-json.exe
-    ${CMAKE_SOURCE_DIR}/ges-minimal-transition.exe
+	  ${CMAKE_SOURCE_DIR}/bin/ges-demo.exe
+	  ${CMAKE_SOURCE_DIR}/bin/ges-minimal.exe
+	  ${CMAKE_SOURCE_DIR}/bin/ges-json.exe
   )
 else()
   set (INSTALL_BINARIES
-	  ${CMAKE_SOURCE_DIR}/ges-demo
-	  ${CMAKE_SOURCE_DIR}/ges-minimal
-	  ${CMAKE_SOURCE_DIR}/ges-json
-    ${CMAKE_SOURCE_DIR}/ges-minimal-transition
+	  ${CMAKE_SOURCE_DIR}/bin/ges-demo
+	  ${CMAKE_SOURCE_DIR}/bin/ges-minimal
+	  ${CMAKE_SOURCE_DIR}/bin/ges-json
   )
 endif()
 
