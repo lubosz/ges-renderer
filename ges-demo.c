@@ -281,7 +281,7 @@ videoTransparencyTL (void)
   ges_timeline_add_layer (timeline, layer1);
   g_object_set (layer1, "priority", 0, NULL);
 
-  ges_clip_from_rel_path ("transparent/bokeeh.mov", layer1, 0, 0, 10,
+  ges_clip_from_rel_path ("transparent/bokeeh-raw.mkv", layer1, 0, 0, 10,
       GES_TRACK_TYPE_VIDEO);
 
   GESLayer *layer2 = ges_layer_new ();
