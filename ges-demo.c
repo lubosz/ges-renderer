@@ -310,8 +310,9 @@ alphaTestTL (void)
     timeline = NULL;
   }
 
-  GESRendererProfile pal = { 720, 576, 25 };
-  GstCaps *caps = gst_caps_from_renderer_profile (&pal);
+  const gchar *capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
+  GstCaps *caps = gst_caps_from_string (capsstring);
+
   ges_track_set_restriction_caps (trackv, caps);
 
   GESLayer *layer1 = ges_layer_new ();
