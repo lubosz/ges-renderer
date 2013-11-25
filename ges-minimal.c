@@ -78,9 +78,6 @@ main (int argc, char **argv)
   g_main_loop_run (mainloop);
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 
-  gst_object_unref (track);
-  gst_object_unref (layer);
-  gst_object_unref (timeline);
   gst_object_unref (pipeline);
   g_main_loop_unref (mainloop);
 
