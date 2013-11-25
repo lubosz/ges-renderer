@@ -11,8 +11,23 @@
 #include <windows.h>
 #endif
 
-#include "ges-demo.h"
 #include "ges-renderer.h"
+
+GESTimeline *testPatternTL (void);
+GESTimeline *effectTL (void);
+GESTimeline *testTL (void);
+GESTimeline *minuteTL (void);
+GESTimeline *imageTL (void);
+GESTimeline *musicTL (void);
+GESTimeline *hdTL (void);
+GESTimeline *transitionTL (void);
+GESTimeline *overlayTL (void);
+GESTimeline *videoTransparencyTL (void);
+GESTimeline *volumeTestTL (void);
+GESTimeline *positionTestTL (void);
+GESTimeline *alphaTestTL (void);
+GESTimeline *compTL (void);
+void tests (void);
 
 GESTimeline *
 testPatternTL (void)
@@ -104,31 +119,6 @@ transitionTL (void)
 }
 
 GESTimeline *
-testTL (void)
-{
-  GESTimeline *timeline;
-  GESLayer *layer;
-
-  timeline = ges_timeline_new_pal ();
-  layer = ges_layer_new ();
-
-  ges_timeline_add_layer (timeline, layer);
-
-  GESClip *src = GES_CLIP (ges_test_clip_new ());
-
-  g_object_set (src,
-      "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
-      "duration", 5 * GST_SECOND, NULL);
-
-  ges_layer_add_clip (layer, src);
-
-  ges_timeline_commit (timeline);
-
-  return timeline;
-}
-
-
-GESTimeline *
 minuteTL (void)
 {
   GESTimeline *timeline;
@@ -165,8 +155,8 @@ imageTL (void)
 
   ges_timeline_add_layer (timeline, layer);
 
-  ges_clip_unknown_from_rel_path ("images/LAMP_720_576.jpg", layer, 0, 0, 6);
-  ges_clip_unknown_from_rel_path ("images/wallpaper-1946968.jpg", layer, 3, 0,
+  ges_clip_unknown_from_rel_path ("image/LAMP_720_576.jpg", layer, 0, 0, 6);
+  ges_clip_unknown_from_rel_path ("image/wallpaper-1946968.jpg", layer, 3, 0,
       6);
 
   ges_timeline_commit (timeline);
@@ -216,7 +206,7 @@ overlayTL (void)
   ges_timeline_add_layer (timeline, layer);
   ges_timeline_add_layer (timeline, layer2);
 
-  ges_clip_unknown_from_rel_path ("images/PNG_transparency_demonstration_1.png",
+  ges_clip_unknown_from_rel_path ("image/PNG_transparency_demonstration_1.png",
       layer, 0, 0, 10);
   ges_clip_unknown_from_rel_path ("hd/fluidsimulation.mp4", layer2, 0, 0, 10);
 
@@ -478,27 +468,7 @@ positionTestTL (void)
 }
 
 void
-playTests (void)
-{
-  ges_renderer_play (hdTL ());
-  ges_renderer_play (musicTL ());
-  ges_renderer_play (testTL ());
-  ges_renderer_play (transitionTL ());
-  ges_renderer_play (effectTL ());
-  ges_renderer_play (minuteTL ());
-}
-
-void
-formatTests (void)
-{
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_VP8_WEBM);
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_THEORA_OGG);
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_H264_MATROSKA);
-}
-
-void
-renderTests (void)
+tests (void)
 {
   GESRendererProfile hd = { 1280, 720, 30, PROFILE_AAC_H264_QUICKTIME };
   GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
@@ -509,12 +479,6 @@ renderTests (void)
   ges_renderer_render (musicTL (), "audio", &pal);
   ges_renderer_render (imageTL (), "image", &pal);
   ges_renderer_render (transitionTL (), "transition", &pal);
-}
-
-void
-newTests (void)
-{
-  GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
 
   ges_renderer_render (compTL (), "compTL", &pal);
   ges_renderer_render (volumeTestTL (), "volumeTestTL", &pal);
@@ -533,9 +497,7 @@ main (int argc, char **argv)
 
   ges_renderer_init ();
 
-  formatTests ();
-  renderTests ();
-  newTests ();
+  tests ();
 
   return 0;
 }

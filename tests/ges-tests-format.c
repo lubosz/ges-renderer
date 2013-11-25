@@ -1,0 +1,59 @@
+/*
+
+  Author: Lubosz Sarnecki
+  2013
+
+*/
+
+#include <stdlib.h>
+
+#ifdef PLATTFORM_WINDOWS
+#include <windows.h>
+#endif
+
+#include "ges-renderer.h"
+
+GESTimeline *testTL (void);
+
+GESTimeline *
+testTL (void)
+{
+  GESTimeline *timeline;
+  GESLayer *layer;
+
+  timeline = ges_timeline_new_pal ();
+  layer = ges_layer_new ();
+
+  ges_timeline_add_layer (timeline, layer);
+
+  GESClip *src = GES_CLIP (ges_test_clip_new ());
+
+  g_object_set (src,
+      "vpattern", GES_VIDEO_TEST_PATTERN_SMPTE,
+      "duration", 5 * GST_SECOND, NULL);
+
+  ges_layer_add_clip (layer, src);
+
+  ges_timeline_commit (timeline);
+
+  return timeline;
+}
+
+int
+main (int argc, char **argv)
+{
+#ifdef PLATTFORM_WINDOWS
+  LoadLibrary ("exchndl.dll");
+#endif
+  gst_init (&argc, &argv);
+  ges_init ();
+
+  ges_renderer_init ();
+
+  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_VP8_WEBM);
+  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_THEORA_OGG);
+  ges_renderer_render_pal (testTL (), "formats", PROFILE_AAC_H264_QUICKTIME);
+  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_H264_MATROSKA);
+
+  return 0;
+}
