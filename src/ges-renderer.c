@@ -90,6 +90,16 @@ ges_clip_unknown_from_rel_path (const gchar * path, GESLayer * layer,
 }
 
 GESClip *
+ges_multi_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
+    gint start, gint in, gint dur)
+{
+  gchar *multi_path =
+      g_strconcat ("multi", ges_renderer_get_absolute_path (rel_path), NULL);
+  return ges_clip_from_path (multi_path, layer, start, in, dur,
+      GES_TRACK_TYPE_VIDEO);
+}
+
+GESClip *
 ges_clip_from_rel_path (const gchar * rel_path, GESLayer * layer, gint start,
     gint in, gint dur, GESTrackType tt)
 {
