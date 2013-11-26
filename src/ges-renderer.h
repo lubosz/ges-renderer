@@ -69,20 +69,17 @@ void ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
     GESRendererProfile * profile);
 
 void ges_renderer_play (GESTimeline * timeline);
-void ges_renderer_render_pal (GESTimeline * timeline, const gchar * name,
-    EncodingProfile profile);
 void ges_renderer_render (GESTimeline * timeline, const gchar * name,
     GESRendererProfile * profile);
 
 void ges_renderer_profile_print (GESRendererProfile * profile);
 
+
 void ges_renderer_init_path (void);
 
 GstCaps *gst_caps_from_renderer_profile (GESRendererProfile * profile);
 
-GESTimeline *ges_timeline_new_pal (void);
-GESTimeline *ges_timeline_audio_video_from_videosize (GESRendererProfile *
-    profile);
+GESTimeline * ges_timeline_new_video(void);
 
 gint ges_asset_get_structure_int (GESUriClipAsset * asset, const char *name);
 gint ges_asset_get_width (GESUriClipAsset * asset);

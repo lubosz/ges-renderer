@@ -276,6 +276,17 @@ ges_pipeline_from_timeline (GESTimeline * timeline)
   return pipeline;
 }
 
+GESTimeline *
+ges_timeline_new_video (void)
+{
+  GESTrack *trackv;
+  GESTimeline *timeline;
+  timeline = ges_timeline_new ();
+  trackv = GES_TRACK (ges_video_track_new ());
+  ges_timeline_add_track (timeline, trackv);
+  return timeline;
+}
+
 void
 ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
     GESRendererProfile * profile)
@@ -328,14 +339,6 @@ ges_renderer_play (GESTimeline * timeline)
 }
 
 void
-ges_renderer_render_pal (GESTimeline * timeline, const gchar * name,
-    EncodingProfile profile)
-{
-  GESRendererProfile pal = { 720, 576, 25, profile };
-  ges_renderer_render (timeline, name, &pal);
-}
-
-void
 ges_renderer_render (GESTimeline * timeline, const gchar * name,
     GESRendererProfile * profile)
 {
@@ -354,36 +357,4 @@ ges_renderer_render (GESTimeline * timeline, const gchar * name,
 
   g_print ("%s took %.2fs\n", exitStatus, dur);
   g_print ("====\n");
-}
-
-GESTimeline *
-ges_timeline_new_pal (void)
-{
-  GESTimeline *timeline;
-  GESRendererProfile pal = { 720, 576, 25 };
-  timeline = ges_timeline_audio_video_from_videosize (&pal);
-  return timeline;
-}
-
-GESTimeline *
-ges_timeline_audio_video_from_videosize (GESRendererProfile * profile)
-{
-  GESTimeline *timeline;
-  GESTrack *tracka, *trackv;
-  timeline = ges_timeline_new ();
-
-  tracka = GES_TRACK (ges_audio_track_new ());
-  trackv = GES_TRACK (ges_video_track_new ());
-
-  if (!ges_timeline_add_track (timeline, trackv) ||
-      !ges_timeline_add_track (timeline, tracka)) {
-    gst_object_unref (timeline);
-    timeline = NULL;
-  }
-
-  GstCaps *caps = gst_caps_from_renderer_profile (profile);
-
-  ges_track_set_restriction_caps (trackv, caps);
-
-  return timeline;
 }

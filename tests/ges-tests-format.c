@@ -21,7 +21,7 @@ testTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new_video ();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -50,10 +50,15 @@ main (int argc, char **argv)
 
   ges_renderer_init ();
 
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_VP8_WEBM);
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_THEORA_OGG);
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_AAC_H264_QUICKTIME);
-  ges_renderer_render_pal (testTL (), "formats", PROFILE_VORBIS_H264_MATROSKA);
+  GESRendererProfile webm = { 720, 576, 25, PROFILE_VORBIS_VP8_WEBM };
+  GESRendererProfile ogg = { 720, 576, 25, PROFILE_VORBIS_THEORA_OGG };
+  GESRendererProfile qt = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
+  GESRendererProfile mkv = { 720, 576, 25, PROFILE_VORBIS_H264_MATROSKA };
+
+  ges_renderer_render (testTL (), "formats", &webm);
+  ges_renderer_render (testTL (), "formats", &ogg);
+  ges_renderer_render (testTL (), "formats", &qt);
+  ges_renderer_render (testTL (), "formats", &mkv);
 
   return 0;
 }

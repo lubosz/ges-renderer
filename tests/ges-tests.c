@@ -36,7 +36,7 @@ testPatternTL (void)
   GESLayer *layer;
   GESTestClip *srca, *srcb;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new_audio_video ();
 
   layer = ges_layer_new ();
   g_object_set (layer, "auto-transition", TRUE, NULL);
@@ -72,7 +72,7 @@ effectTL (void)
   GESClip *clip1, *clip2;
   GESEffect *effect1, *effect2;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new_audio_video ();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -103,7 +103,7 @@ transitionTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new_audio_video ();
   layer = ges_layer_new ();
 
   g_object_set (layer, "auto-transition", TRUE, NULL);
@@ -124,7 +124,7 @@ minuteTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new_audio_video ();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -147,16 +147,8 @@ imageTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
-  GESTrack *trackv;
 
-  timeline = ges_timeline_new ();
-
-  trackv = GES_TRACK (ges_video_track_new ());
-  ges_timeline_add_track (timeline, trackv);
-
-  const gchar *capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
-  GstCaps *caps = gst_caps_from_string (capsstring);
-  ges_track_set_restriction_caps (trackv, caps);
+  timeline = ges_timeline_new_video ();
 
   layer = ges_layer_new ();
   g_object_set (layer, "auto-transition", TRUE, NULL);
@@ -178,8 +170,7 @@ hdTL (void)
   GESTimeline *timeline;
   GESLayer *layer;
 
-  GESRendererProfile hd = { 1280, 720, 30 };
-  timeline = ges_timeline_audio_video_from_videosize (&hd);
+  timeline = ges_timeline_new_video ();
   layer = ges_layer_new ();
 
   ges_timeline_add_layer (timeline, layer);
@@ -198,7 +189,7 @@ overlayTL (void)
   GESTimeline *timeline;
   GESLayer *layer, *layer2;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new_video ();
   layer = ges_layer_new ();
   layer2 = ges_layer_new ();
 
@@ -257,23 +248,7 @@ musicTL (void)
 GESTimeline *
 videoTransparencyTL (void)
 {
-  GESTimeline *timeline;
-  GESTrack *trackv;
-  timeline = ges_timeline_new ();
-
-  trackv = GES_TRACK (ges_video_track_new ());
-
-  ges_timeline_add_track (timeline, trackv);
-
-  GstCaps *caps;
-//  const gchar * capsstring = "video/x-raw,width=720,height=576,framerate=25/1,format=I420";
-  const gchar *capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
-
-  caps = gst_caps_from_string (capsstring);
-  gchar *capstring = gst_caps_to_string (caps);
-  g_print ("caps: %s\n", capstring);
-
-  ges_track_set_restriction_caps (trackv, caps);
+  GESTimeline *timeline = ges_timeline_new_video ();
 
   GESLayer *layer1 = ges_layer_new ();
   ges_timeline_add_layer (timeline, layer1);
