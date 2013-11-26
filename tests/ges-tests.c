@@ -147,8 +147,16 @@ imageTL (void)
 {
   GESTimeline *timeline;
   GESLayer *layer;
+  GESTrack *trackv;
 
-  timeline = ges_timeline_new_pal ();
+  timeline = ges_timeline_new ();
+
+  trackv = GES_TRACK (ges_video_track_new ());
+  ges_timeline_add_track (timeline, trackv);
+
+  const gchar *capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
+  GstCaps *caps = gst_caps_from_string (capsstring);
+  ges_track_set_restriction_caps (trackv, caps);
 
   layer = ges_layer_new ();
   g_object_set (layer, "auto-transition", TRUE, NULL);
