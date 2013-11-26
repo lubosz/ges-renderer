@@ -297,9 +297,14 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
   //set restriction caps
   GList *tracks = ges_timeline_get_tracks (timeline);
   GESTrack *trackv = g_list_first (tracks)->data;
-  GstCaps *caps = gst_caps_from_renderer_profile (profile);
-  ges_track_set_restriction_caps (trackv, caps);
-  g_print ("setting restiction caps: %s\n", gst_caps_to_string (caps));
+
+  if (GES_IS_VIDEO_TRACK (trackv)) {
+    GstCaps *caps = gst_caps_from_renderer_profile (profile);
+    ges_track_set_restriction_caps (trackv, caps);
+    g_print ("restiction caps: %s\n", gst_caps_to_string (caps));
+  } else {
+    g_print ("Not a video track");
+  }
 
   pipeline = ges_pipeline_from_timeline (timeline);
 
