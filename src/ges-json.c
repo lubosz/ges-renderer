@@ -200,9 +200,6 @@ render_json (JsonNode * root)
   }
   json_reader_end_member (reader);
 
-
-
-
   ges_timeline_commit (timeline);
 
   // formats
@@ -243,7 +240,7 @@ main (int argc, char *argv[])
   GError *error;
 
   if (argc < 2) {
-    g_print ("Usage: ./ges-json.exe <filename.json>\n");
+    g_print ("Usage: ./ges-json <filename.json>\n");
     return EXIT_FAILURE;
   }
 
@@ -252,7 +249,7 @@ main (int argc, char *argv[])
   error = NULL;
   json_parser_load_from_file (parser, argv[1], &error);
   if (error) {
-    g_print ("Unable to parse `%s': %s", argv[1], error->message);
+    g_print ("Parsing error `%s':\n %s\n", argv[1], error->message);
     g_error_free (error);
     g_object_unref (parser);
     return EXIT_FAILURE;
