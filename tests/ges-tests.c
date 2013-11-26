@@ -489,15 +489,17 @@ tests (void)
 {
   GESRendererProfile hd = { 1280, 720, 30, PROFILE_AAC_H264_QUICKTIME };
   GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
+  GESRendererProfile pal_noalpha =
+      { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME, "I420" };
 
   ges_renderer_render (effectTL (), "effect", &pal);
   ges_renderer_render (minuteTL (), "1minute", &pal);
   ges_renderer_render (hdTL (), "hd", &hd);
   ges_renderer_render (musicTL (), "audio", &pal);
-  ges_renderer_render (imageTL (), "image", &pal);
-  ges_renderer_render (transitionTL (), "transition", &pal);
+  ges_renderer_render (imageTL (), "image", &pal_noalpha);
+  ges_renderer_render (transitionTL (), "transition", &pal_noalpha);
 
-  ges_renderer_render (compTL (), "compTL", &pal);
+  ges_renderer_render (compTL (), "compTL", &hd);
   ges_renderer_render (volumeTestTL (), "volumeTestTL", &pal);
   ges_renderer_render (alphaTestTL (), "alphaTestTL", &pal);
   ges_renderer_render (videoTransparencyTL (), "videoTransparencyTL", &pal);
