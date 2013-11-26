@@ -19,6 +19,15 @@ getString (JsonReader * reader, const gchar * member_name)
   return value;
 }
 
+const gdouble
+getDouble (JsonReader * reader, const gchar * member_name)
+{
+  json_reader_read_member (reader, member_name);
+  double value = json_reader_get_double_value (reader);
+  json_reader_end_member (reader);
+  return value;
+}
+
 const int
 getInt (JsonReader * reader, const gchar * member_name)
 {
@@ -38,24 +47,12 @@ getBool (JsonReader * reader, const gchar * member_name)
 }
 
 void
-getAssets (JsonReader * reader, const gchar * member_name,
-    GESTimeline * timeline, GESTrackType type, gboolean transitions)
+getClips (JsonReader * reader, GESLayer * layer, GESTrackType type)
 {
-
-  if (!is_in_members (reader, member_name))
-    return;
-
-  GESLayer *layer = ges_layer_new ();
-
-  if (transitions)
-    g_object_set (layer, "auto-transition", TRUE, NULL);
-
-  ges_timeline_add_layer (timeline, layer);
-
   int i;
-  json_reader_read_member (reader, member_name);
+  json_reader_read_member (reader, "clips");
 
-  g_print ("= %s clips =\n", member_name);
+  g_print ("= clips =\n");
 
   for (i = 0; i < json_reader_count_elements (reader); i++) {
     json_reader_read_element (reader, i);
@@ -64,9 +61,68 @@ getAssets (JsonReader * reader, const gchar * member_name,
     int in = getInt (reader, "in");
     int dur = getInt (reader, "dur");
     g_print ("Clip: %s (start: %d, in: %d, dur: %d)\n", src, start, in, dur);
-    GESClip *clip =
-        ges_clip_from_path (ges_renderer_get_absolute_path (src), layer, start,
-        in, dur, type);
+
+    GESClip *clip;
+
+    if (is_in_members (reader, "multi") && getBool (reader, "multi")) {
+      g_print ("multi on.\n");
+      clip = ges_multi_clip_from_rel_path (src, layer, start, in, dur);
+    } else {
+      clip =
+          ges_clip_from_path (ges_renderer_get_absolute_path (src), layer,
+          start, in, dur, type);
+    }
+
+    GESTimeline *tl = ges_layer_get_timeline (layer);
+    GList *tracks = ges_timeline_get_tracks (tl);
+    GESTrack *trackv = g_list_first (tracks)->data;
+    GESTrack *tracka = g_list_last (tracks)->data;
+
+    if (is_in_members (reader, "volume")) {
+      double volume = getDouble (reader, "volume");
+      GESTrackElement *audioElement =
+          ges_clip_find_track_element (clip, tracka, G_TYPE_NONE);
+      ges_track_element_set_child_properties (audioElement, "volume", volume,
+          NULL);
+
+    }
+
+    GESTrackElement *videoElement =
+        ges_clip_find_track_element (clip, trackv, G_TYPE_NONE);
+
+    if (is_in_members (reader, "x")) {
+      int x = getInt (reader, "x");
+      ges_track_element_set_child_properties (videoElement, "posx", x, NULL);
+    }
+
+    if (is_in_members (reader, "y")) {
+      int y = getInt (reader, "y");
+      ges_track_element_set_child_properties (videoElement, "posy", y, NULL);
+    }
+
+    if (is_in_members (reader, "alpha")) {
+      gdouble alpha = getDouble (reader, "alpha");
+      ges_track_element_set_child_properties (videoElement, "alpha", alpha,
+          NULL);
+    }
+
+    if (is_in_members (reader, "size")) {
+      gdouble size = getDouble (reader, "size");
+      GESUriClipAsset *asset =
+          GES_URI_CLIP_ASSET (ges_extractable_get_asset (GES_EXTRACTABLE
+              (clip)));
+      guint width = ges_asset_get_width (asset);
+      guint height = ges_asset_get_height (asset);
+      double dw = width * size;
+      double dh = height * size;
+
+      g_print ("%dx%d => * %f => %dx%d\n", width, height, size, (int) dw,
+          (int) dh);
+
+      ges_track_element_set_child_properties (videoElement,
+          "width", (int) dw, "height", (int) dh, NULL);
+
+    }
 
     if (is_in_members (reader, "effect")) {
       const char *effect_str = getString (reader, "effect");
@@ -100,19 +156,14 @@ void
 render_json (JsonNode * root)
 {
   JsonReader *reader = json_reader_new (root);
-  GESTimeline *jsonTimeline;
+  GESTimeline *timeline;
 
   json_reader_read_member (reader, "composition");
 
   // comp strings
   const char *name = getString (reader, "name");
-  gboolean autotransition = getBool (reader, "autotransition");
-  const char *src_dir = getString (reader, "src-dir");
-
-  g_print ("Source Directory: %s\nName: %s\n", src_dir, name);
-
-  if (autotransition)
-    g_print ("Auto Transitions on.\n");
+  //const char *src_dir = getString (reader, "src-dir");
+  //g_print ("Source Directory: %s\nName: %s\n", src_dir, name);
 
   // comp ints
   int width = getInt (reader, "width");
@@ -122,23 +173,40 @@ render_json (JsonNode * root)
   g_print ("Resolution: %dx%d, FPS: %d\n", width, height, fps);
 
   GESRendererProfile res = { width, height, fps };
-  jsonTimeline = ges_timeline_audio_video_from_videosize (&res);
+  timeline = ges_timeline_audio_video_from_videosize (&res);
 
-  // videos
-  getAssets (reader, "video", jsonTimeline, GES_TRACK_TYPE_UNKNOWN,
-      autotransition);
-  getAssets (reader, "music", jsonTimeline, GES_TRACK_TYPE_AUDIO,
-      autotransition);
-  getAssets (reader, "image", jsonTimeline, GES_TRACK_TYPE_VIDEO,
-      autotransition);
-  getAssets (reader, "voice", jsonTimeline, GES_TRACK_TYPE_AUDIO, FALSE);
-  getAssets (reader, "sound", jsonTimeline, GES_TRACK_TYPE_AUDIO, FALSE);
+  int i;
+  json_reader_read_member (reader, "layers");
 
-  ges_timeline_commit (jsonTimeline);
+  for (i = 0; i < json_reader_count_elements (reader); i++) {
+    json_reader_read_element (reader, i);
+
+    GESLayer *layer = ges_layer_new ();
+
+    g_object_set (layer, "priority", i, NULL);
+
+    if (is_in_members (reader, "autotransition")) {
+      gboolean autotransition = getBool (reader, "autotransition");
+      if (autotransition)
+        g_print ("Auto Transitions on.\n");
+      g_object_set (layer, "auto-transition", autotransition, NULL);
+    }
+
+    ges_timeline_add_layer (timeline, layer);
+
+    getClips (reader, layer, GES_TRACK_TYPE_UNKNOWN);
+
+    json_reader_end_element (reader);
+  }
+  json_reader_end_member (reader);
+
+
+
+
+  ges_timeline_commit (timeline);
 
   // formats
   json_reader_read_member (reader, "formats");
-  int i;
   for (i = 0; i < json_reader_count_elements (reader); i++) {
     json_reader_read_element (reader, i);
     const char *format = json_reader_get_string_value (reader);
@@ -155,7 +223,7 @@ render_json (JsonNode * root)
       prof = PROFILE_VORBIS_THEORA_OGG;
     }
     res.profile = prof;
-    ges_renderer_render (jsonTimeline, name, &res);
+    ges_renderer_render (timeline, name, &res);
   }
   json_reader_end_member (reader);
 
