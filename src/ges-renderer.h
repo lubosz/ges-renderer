@@ -19,7 +19,7 @@ static const char *const profiles[][4] = {
   {"application/ogg", "audio/x-vorbis", "video/x-theora", "ogv"},
   {"video/webm", "audio/x-vorbis", "video/x-vp8", "webm"},
   {"video/quicktime,variant=iso", "audio/mpeg,mpegversion=1,layer=3",
-        "video/x-h264", "mp4"},
+      "video/x-h264", "mp4"},
   {"video/x-matroska", "audio/x-vorbis", "video/x-h264", "mkv"},
 };
 
@@ -55,8 +55,8 @@ GESClip *ges_multi_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
 
 void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
-GstEncodingProfile *ges_renderer_profile_get_encoding_profile (
-    GESRendererProfile * profile);
+GstEncodingProfile
+    *ges_renderer_profile_get_encoding_profile (GESRendererProfile * profile);
 
 gboolean ges_renderer_print_progress (void);
 
@@ -73,14 +73,15 @@ void ges_renderer_render_pal (GESTimeline * timeline, const gchar * name,
 void ges_renderer_render (GESTimeline * timeline, const gchar * name,
     GESRendererProfile * profile);
 
-void ges_renderer_profile_print(GESRendererProfile * profile);
+void ges_renderer_profile_print (GESRendererProfile * profile);
 
 void ges_renderer_init_path (void);
 
 GstCaps *gst_caps_from_renderer_profile (GESRendererProfile * profile);
 
 GESTimeline *ges_timeline_new_pal (void);
-GESTimeline *ges_timeline_audio_video_from_videosize (GESRendererProfile * profile);
+GESTimeline *ges_timeline_audio_video_from_videosize (GESRendererProfile *
+    profile);
 
 gint ges_asset_get_structure_int (GESUriClipAsset * asset, const char *name);
 gint ges_asset_get_width (GESUriClipAsset * asset);
