@@ -146,10 +146,16 @@ bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop)
       g_printerr ("Debugging info: %s\n", (dbg_info) ? dbg_info : "none");
       g_error_free (err);
       g_free (dbg_info);
+
+      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
+          GST_DEBUG_GRAPH_SHOW_ALL, "ges-renderer-error");
+
       g_main_loop_quit (mainloop);
       break;
     }
     case GST_MESSAGE_EOS:{
+      GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
+          GST_DEBUG_GRAPH_SHOW_ALL, "ges-renderer-eos");
       g_print ("\nDone\n");
       g_main_loop_quit (mainloop);
       break;
@@ -292,6 +298,9 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
   gst_object_unref (bus);
 
   gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+
+  GST_DEBUG_BIN_TO_DOT_FILE_WITH_TS (GST_BIN (pipeline),
+      GST_DEBUG_GRAPH_SHOW_ALL, "ges-renderer");
 
   g_main_loop_run (mainloop);
   g_main_loop_unref (mainloop);
