@@ -39,6 +39,7 @@ struct GESRendererProfile
   gint height;
   gint fps;
   EncodingProfile profile;
+  const gchar* format;
 };
 
 char *ges_renderer_get_absolute_path (const char *rel_path);
