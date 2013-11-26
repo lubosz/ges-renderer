@@ -393,11 +393,11 @@ compTL (void)
   trackv = GES_TRACK (ges_video_track_new ());
   ges_timeline_add_track (timeline, trackv);
 
-  const gchar *capsstring = "video/x-raw,width=1920,height=1080,framerate=25/1";
+  const gchar *capsstring = "video/x-raw,width=1280,height=720,framerate=30/1";
   GstCaps *caps = gst_caps_from_string (capsstring);
   gchar *capstring = gst_caps_to_string (caps);
   g_print ("caps: %s\n", capstring);
-//  ges_track_set_restriction_caps(trackv, caps);
+  ges_track_set_restriction_caps (trackv, caps);
 
   const gchar *assets[] = { "image/vieh.png",
     "image/PNG_transparency_demonstration_1.png",
@@ -412,17 +412,23 @@ compTL (void)
     ges_timeline_add_layer (timeline, layer);
     g_object_set (layer, "priority", i - 1, NULL);
 
-    g_print ("asset %s\n", assets[i - 1]);
-
     GESClip *vieh = ges_clip_from_rel_path (assets[i - 1], layer, 0, 0, 10,
         GES_TRACK_TYPE_VIDEO);
 
     GESTrackElement *elem =
         ges_clip_find_track_element (vieh, trackv, G_TYPE_NONE);
 
+    GESUriClipAsset *asset =
+        GES_URI_CLIP_ASSET (ges_extractable_get_asset (GES_EXTRACTABLE (vieh)));
+
+    guint width = ges_asset_get_width (asset);
+    guint height = ges_asset_get_height (asset);
+
+    g_print ("%s: %dx%d\n", assets[i - 1], width, height);
+
     ges_track_element_set_child_properties (elem,
         "posx", i * 100, "posy", i * 100,
-        "width", i * 100, "height", i * 100, NULL);
+        "width", i * 100 * width / height, "height", (i * 100) - 1, NULL);
   }
 
   GESLayer *backgroud_layer = ges_layer_new ();

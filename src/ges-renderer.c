@@ -116,12 +116,6 @@ ges_clip_from_path (const gchar * path, GESLayer * layer, gint start, gint in,
   GESClip *clip;
 
   asset = ges_uri_clip_asset_request_sync (path, error);
-
-  guint width = ges_asset_get_width (asset);
-  guint height = ges_asset_get_height (asset);
-
-  g_print ("Size %dx%d\n", width, height);
-
   clip = ges_layer_add_asset (layer, GES_ASSET (asset),
       start * GST_SECOND, in * GST_SECOND, dur * GST_SECOND, tt);
 
