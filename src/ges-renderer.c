@@ -283,6 +283,13 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
 
+  //set restriction caps
+  GList *tracks = ges_timeline_get_tracks (timeline);
+  GESTrack *trackv = g_list_first (tracks)->data;
+  GstCaps *caps = gst_caps_from_renderer_profile (profile);
+  ges_track_set_restriction_caps (trackv, caps);
+  g_print ("setting restiction caps: %s\n", gst_caps_to_string (caps));
+
   pipeline = ges_pipeline_from_timeline (timeline);
 
   if (name != NULL) {

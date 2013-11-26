@@ -311,11 +311,6 @@ alphaTestTL (void)
     timeline = NULL;
   }
 
-  const gchar *capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
-  GstCaps *caps = gst_caps_from_string (capsstring);
-
-  ges_track_set_restriction_caps (trackv, caps);
-
   GESLayer *layer1 = ges_layer_new ();
   GESLayer *layer2 = ges_layer_new ();
 
@@ -393,12 +388,6 @@ compTL (void)
   trackv = GES_TRACK (ges_video_track_new ());
   ges_timeline_add_track (timeline, trackv);
 
-  const gchar *capsstring = "video/x-raw,width=1280,height=720,framerate=30/1";
-  GstCaps *caps = gst_caps_from_string (capsstring);
-  gchar *capstring = gst_caps_to_string (caps);
-  g_print ("caps: %s\n", capstring);
-  ges_track_set_restriction_caps (trackv, caps);
-
   const gchar *assets[] = { "image/vieh.png",
     "image/PNG_transparency_demonstration_1.png",
     "image/Ice_Cream.png",
@@ -455,12 +444,6 @@ positionTestTL (void)
   timeline = ges_timeline_new ();
   trackv = GES_TRACK (ges_video_track_new ());
   ges_timeline_add_track (timeline, trackv);
-
-  const gchar *capsstring = "video/x-raw,width=720,height=576,framerate=25/1";
-  GstCaps *caps = gst_caps_from_string (capsstring);
-  gchar *capstring = gst_caps_to_string (caps);
-  g_print ("caps: %s\n", capstring);
-  ges_track_set_restriction_caps (trackv, caps);
 
   GESLayer *layer = ges_layer_new ();
   ges_timeline_add_layer (timeline, layer);
