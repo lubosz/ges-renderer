@@ -93,8 +93,13 @@ GESClip *
 ges_multi_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
     gint start, gint in, gint dur)
 {
+  gchar *abs_path = ges_renderer_get_absolute_path (rel_path);
+
   gchar *multi_path =
-      g_strconcat ("multi", ges_renderer_get_absolute_path (rel_path), NULL);
+      g_strconcat ("multi", abs_path, NULL);
+
+  g_print("Path: %s\n abs %s\n multipath %s\n", rel_path, abs_path, multi_path);
+
   return ges_clip_from_path (multi_path, layer, start, in, dur,
       GES_TRACK_TYPE_VIDEO);
 }
