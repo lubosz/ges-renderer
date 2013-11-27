@@ -36,7 +36,8 @@ if( WIN32 )
   set (LIBS ${LIBS} Kernel32.dll)
   #set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../../dist/windows_x86_64)
   set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64)
-  
+  #set(OS_PREFIX C:/Users/Lubosz/cerbero/dist/windows_x86_64)
+  #set(OS_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
 else()
   set(OS_PREFIX /usr)
 endif()
@@ -76,7 +77,8 @@ set(BINPERMISSIONS PERMISSIONS
 
 if( WIN32 )
   set (INSTALL_BINARIES
-	  ${CMAKE_SOURCE_DIR}/bin/ges-demo.exe
+	  ${CMAKE_SOURCE_DIR}/bin/ges-tests-format.exe
+    ${CMAKE_SOURCE_DIR}/bin/ges-tests.exe
 	  ${CMAKE_SOURCE_DIR}/bin/ges-minimal.exe
 	  ${CMAKE_SOURCE_DIR}/bin/ges-json.exe
   )
