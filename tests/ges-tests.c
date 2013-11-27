@@ -460,7 +460,7 @@ tests (void)
   ges_renderer_render (compTL (), "compTL", &hd);
   ges_renderer_render (volumeTestTL (), "volumeTestTL", &pal);
   ges_renderer_render (alphaTestTL (), "alphaTestTL", &pal);
-  ges_renderer_render (videoTransparencyTL (), "videoTransparencyTL", &pal);
+  ges_renderer_render (videoTransparencyTL (), "videoTransparencyTL", &hd);
 }
 
 int
