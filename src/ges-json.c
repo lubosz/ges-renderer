@@ -170,6 +170,12 @@ render_json (JsonNode * root)
   int height = getInt (reader, "height");
   int fps = getInt (reader, "fps");
 
+  gboolean transparency = TRUE;
+
+  if (is_in_members (reader, "transparency")) {
+    transparency = getBool (reader, "transparency");
+  }
+
   g_print ("Resolution: %dx%d, FPS: %d\n", width, height, fps);
 
   timeline = ges_timeline_new_audio_video ();
@@ -202,8 +208,12 @@ render_json (JsonNode * root)
   ges_timeline_commit (timeline);
 
   // formats
-  GESRendererProfile res =
-      { width, height, fps, PROFILE_AAC_H264_QUICKTIME, NULL };
+  GESRendererProfile res = { width, height, fps, PROFILE_AAC_H264_QUICKTIME, NULL };
+  if (!transparency) {
+    g_print("Deactivating transparency\n");
+    res.format = "I420";
+  }
+      
   json_reader_read_member (reader, "formats");
   for (i = 0; i < json_reader_count_elements (reader); i++) {
     json_reader_read_element (reader, i);
