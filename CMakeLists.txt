@@ -58,8 +58,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src
 )
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-
 add_executable(ges-json src/ges-json.c src/ges-renderer.c)
 
 target_link_libraries(ges-json ${LIBS} json-glib-1.0)
@@ -71,9 +69,6 @@ foreach(TEST_PATH ${GLOB_TESTS})
     add_executable(${TEST_NAME} ${TEST_PATH} src/ges-renderer.c)
     target_link_libraries(${TEST_NAME} ${LIBS})
 endforeach(TEST_PATH)
-
-
-
 
 #install
 set(BINPERMISSIONS PERMISSIONS
