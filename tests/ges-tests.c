@@ -254,7 +254,7 @@ videoTransparencyTL (void)
   ges_timeline_add_layer (timeline, layer1);
   g_object_set (layer1, "priority", 0, NULL);
 
-  ges_multi_clip_from_rel_path ("transparent/blender-cube/png/%04d.png",
+  ges_multi_clip_from_rel_path ("transparent/blender-cube/%04d.png",
       layer1, 0, 0, 10);
 
   //ges_clip_from_rel_path ("transparent/bokeeh-raw.mkv", layer1, 0, 0, 10,
@@ -450,17 +450,17 @@ tests (void)
   GESRendererProfile pal_noalpha =
       { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME, "I420" };
 
-  ges_renderer_render (effectTL (), "effect", &pal);
-  ges_renderer_render (minuteTL (), "1minute", &pal);
-  ges_renderer_render (hdTL (), "hd", &hd);
-  ges_renderer_render (musicTL (), "audio", &pal);
-  ges_renderer_render (imageTL (), "image", &pal_noalpha);
-  ges_renderer_render (transitionTL (), "transition", &pal_noalpha);
+  ges_renderer_render (effectTL (), "c-effect", &pal);
+  ges_renderer_render (minuteTL (), "c-minute", &pal);
+  ges_renderer_render (hdTL (), "c-hd", &hd);
+  ges_renderer_render (musicTL (), "c-audio", &pal);
+  ges_renderer_render (imageTL (), "c-image", &pal_noalpha);
+  ges_renderer_render (transitionTL (), "c-transition", &pal_noalpha);
 
-  ges_renderer_render (compTL (), "compTL", &hd);
-  ges_renderer_render (volumeTestTL (), "volumeTestTL", &pal);
-  ges_renderer_render (alphaTestTL (), "alphaTestTL", &pal);
-  ges_renderer_render (videoTransparencyTL (), "videoTransparencyTL", &hd);
+  ges_renderer_render (compTL (), "c-comp", &hd);
+  //ges_renderer_render (volumeTestTL (), "c-volume", &pal);
+  ges_renderer_render (alphaTestTL (), "c-alpha", &pal);
+  ges_renderer_render (videoTransparencyTL (), "c-videoTransparency", &hd);
 }
 
 int
