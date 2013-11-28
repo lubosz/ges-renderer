@@ -31,13 +31,19 @@ endif()
 
 set(LIBS gstreamer-1.0 ges-1.0 gobject-2.0 glib-2.0 gstpbutils-1.0)
 
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+
 if( WIN32 )
   add_definitions( -DPLATTFORM_WINDOWS )
   set (LIBS ${LIBS} Kernel32.dll)
-  #set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../../dist/windows_x86_64)
-  set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64)
-  #set(OS_PREFIX C:/Users/Lubosz/cerbero/dist/windows_x86_64)
-  #set(OS_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
+  if (WIN_LOCAL)
+    message("LOAL!")
+    set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64)
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64/bin)
+  else()
+    set(OS_PREFIX C:/Users/Lubosz/cerbero/dist/windows_x86_64)
+    #set(OS_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
+  endif(WIN_LOCAL)
 else()
   set(OS_PREFIX /usr)
 endif()
@@ -66,8 +72,8 @@ foreach(TEST_PATH ${GLOB_TESTS})
     target_link_libraries(${TEST_NAME} ${LIBS})
 endforeach(TEST_PATH)
 
-#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
-set(EXECUTABLE_OUTPUT_PATH /c/Users/Lubosz/cerbero/dist/windows_x86_64/bin)
+
+
 
 #install
 set(BINPERMISSIONS PERMISSIONS

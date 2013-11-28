@@ -5,7 +5,8 @@ cmake . \
   -DCMAKE_SYSTEM_NAME=Windows \
   -G"Unix Makefiles" \
   -DCMAKE_C_FLAGS="-Wall -g -O2 -DWINVER=0x0501  -Wno-error" \
-  -DCMAKE_BUILD_TYPE=Debug
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DWIN_LOCAL:BOOL=ON
 
 #  -DCMAKE_FIND_ROOT_PATH=$CERBERO_PREFIX
 #  -DCMAKE_CXX_FLAGS="-Wall -g -O2 -DWINVER=0x0501  -Wno-error "
