@@ -42,7 +42,10 @@ struct GESRendererProfile
   const gchar* format;
 };
 
-char *ges_renderer_get_absolute_path (const char *rel_path);
+gchar *ges_renderer_get_absolute_path (const char *rel_path);
+gchar *ges_renderer_get_data_uri (void);
+gchar *ges_renderer_get_absolute_path_win_multifile (const char *rel_path);
+
 char *replace (char *s, char old, char replacement);
 
 GESClip *ges_clip_unknown_from_rel_path (const gchar * get_path,
@@ -73,9 +76,6 @@ void ges_renderer_render (GESTimeline * timeline, const gchar * name,
     GESRendererProfile * profile);
 
 void ges_renderer_profile_print (GESRendererProfile * profile);
-
-
-void ges_renderer_init_path (void);
 
 GstCaps *gst_caps_from_renderer_profile (GESRendererProfile * profile);
 

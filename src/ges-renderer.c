@@ -9,7 +9,6 @@
 
 #include <stdlib.h>
 
-static gchar *data_path;
 static GESPipeline *pipeline = NULL;
 static GstClockTime duration;
 static gboolean wasError = FALSE;
@@ -31,14 +30,13 @@ void
 ges_renderer_init (void)
 {
   duration = 0;
-  ges_renderer_init_path ();
 }
 
-void
-ges_renderer_init_path (void)
+gchar *
+ges_renderer_get_data_uri (void)
 {
-  duration = 0;
-  char directory[1024];
+  gchar *data_path;
+  gchar directory[1024];
   getcwd (directory, 1024);
 #ifdef PLATTFORM_WINDOWS
   char *replaced = replace (directory, '\\', '/');
@@ -46,15 +44,25 @@ ges_renderer_init_path (void)
 #else
   data_path = g_strconcat ("file://", &directory, "/data/", NULL);
 #endif
+  return data_path;
 }
 
-char *
-ges_renderer_get_absolute_path (const char *rel_path)
+gchar *
+ges_renderer_get_absolute_path_win_multifile (const char *rel_path)
 {
+  gchar *data_path;
+  gchar directory[1024];
+  getcwd (directory, 1024);
+  char *replaced = replace (directory, '\\', '/');
+  data_path = g_strconcat ("file://", replaced, "/data/", NULL);
   return g_strconcat (data_path, rel_path, NULL);
 }
 
-
+gchar *
+ges_renderer_get_absolute_path (const char *rel_path)
+{
+  return g_strconcat (ges_renderer_get_data_uri(), rel_path, NULL);
+}
 
 gint
 ges_asset_get_structure_int (GESUriClipAsset * asset, const char *name)
@@ -93,12 +101,14 @@ GESClip *
 ges_multi_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
     gint start, gint in, gint dur)
 {
-  gchar *abs_path = ges_renderer_get_absolute_path (rel_path);
 
-  gchar *multi_path =
-      g_strconcat ("multi", abs_path, NULL);
-
-  g_print("Path: %s\n abs %s\n multipath %s\n", rel_path, abs_path, multi_path);
+#ifdef PLATTFORM_WINDOWS
+  gchar *multi_path = g_strconcat (
+    "multi", ges_renderer_get_absolute_path_win_multifile (rel_path), NULL);
+#else
+  gchar *multi_path = g_strconcat (
+    "multi", ges_renderer_get_absolute_path (rel_path), NULL);
+#endif
 
   return ges_clip_from_path (multi_path, layer, start, in, dur,
       GES_TRACK_TYPE_VIDEO);
@@ -260,7 +270,7 @@ ges_pipeline_setup_rendering (GESPipeline * pipeline,
   EncodingProfile type = profile->profile;
 
   gchar *fileName =
-      g_strconcat (data_path, "export/", name, ".", profiles[type][3], NULL);
+    g_strconcat (ges_renderer_get_data_uri(), "export/", name, ".", profiles[type][3], NULL);
   g_print ("Rendering %s\n", fileName);
 
   GstEncodingProfile *gst_profile =
