@@ -1,4 +1,4 @@
-export LIBRARY_PATH=/c/Users/Lubosz/cerbero/dist/windows_x86_64/lib/
+#export LIBRARY_PATH=/c/Users/Lubosz/cerbero/dist/windows_x86_64/lib/
 
 cmake . \
   -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
