@@ -182,7 +182,7 @@ render_json (JsonNode * root)
     transparency = getBool (reader, "transparency");
   }
 
-  gboolean absolute_paths = TRUE;
+  gboolean absolute_paths = FALSE;
 
   if (is_in_members (reader, "absolute_paths")) {
     absolute_paths = getBool (reader, "absolute_paths");
