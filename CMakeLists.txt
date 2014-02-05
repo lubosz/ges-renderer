@@ -36,19 +36,15 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 if( WIN32 )
   add_definitions( -DPLATTFORM_WINDOWS )
   set (LIBS ${LIBS} Kernel32.dll)
-  if (WIN_LOCAL)
-    message("LOAL!")
-    set(OS_PREFIX ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64)
-    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/../../cerbero/dist/windows_x86_64/bin)
-  else()
-    set(OS_PREFIX C:/Users/Lubosz/cerbero/dist/windows_x86_64)
-    #set(OS_PREFIX C:/Users/bmonkey/cerbero/dist/windows_x86)
-  endif(WIN_LOCAL)
+  set(OS_PREFIX ${CMAKE_INSTALL_BINDIR}/..)
+  #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_INSTALL_BINDIR})
 else()
   set(OS_PREFIX /usr)
 endif()
 
 message("OS Prefix ${OS_PREFIX}")
+message("CMAKE_INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR}")
+message("CMAKE_LIBRARY_OUTPUT_PATH ${CMAKE_LIBRARY_OUTPUT_PATH}")
 
 include_directories(
   ${OS_PREFIX}/include/gstreamer-1.0
