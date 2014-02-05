@@ -265,12 +265,17 @@ ges_renderer_print_progress (void)
 
 void
 ges_pipeline_setup_rendering (GESPipeline * pipeline,
-    const gchar * name, GESRendererProfile * profile)
+    const gchar * name, GESRendererProfile * profile, gboolean absolute_paths)
 {
   EncodingProfile type = profile->profile;
 
-  gchar *fileName =
-    g_strconcat (ges_renderer_get_data_uri(), "export/", name, ".", profiles[type][3], NULL);
+  const gchar *fileName;
+
+  if (absolute_paths == TRUE) {
+    fileName = name;
+  } else {
+    fileName = g_strconcat (ges_renderer_get_data_uri(), "export/", name, ".", profiles[type][3], NULL);
+  }
   g_print ("Rendering %s\n", fileName);
 
   GstEncodingProfile *gst_profile =
@@ -304,7 +309,7 @@ ges_timeline_new_video (void)
 
 void
 ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
-    GESRendererProfile * profile)
+    GESRendererProfile * profile, gboolean absolute_paths)
 {
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);
@@ -324,7 +329,7 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
   pipeline = ges_pipeline_from_timeline (timeline);
 
   if (name != NULL) {
-    ges_pipeline_setup_rendering (pipeline, name, profile);
+    ges_pipeline_setup_rendering (pipeline, name, profile, absolute_paths);
   } else {
     ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
     g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit, mainloop);
@@ -355,17 +360,17 @@ ges_renderer_play (GESTimeline * timeline)
 {
   gchar *name = NULL;
   GESRendererProfile profile = { 0, 0, 0, PROFILE_NONE };
-  ges_renderer_run_job (timeline, name, &profile);
+  ges_renderer_run_job (timeline, name, &profile, FALSE);
 }
 
 void
 ges_renderer_render (GESTimeline * timeline, const gchar * name,
-    GESRendererProfile * profile)
+    GESRendererProfile * profile, gboolean absolute_paths)
 {
   g_print ("\n====\n");
   float now = (float) g_get_monotonic_time () / (float) GST_MSECOND;
 
-  ges_renderer_run_job (timeline, name, profile);
+  ges_renderer_run_job (timeline, name, profile, absolute_paths);
 
   float then = (float) g_get_monotonic_time () / (float) GST_MSECOND;
   float dur = then - now;

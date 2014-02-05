@@ -55,10 +55,10 @@ main (int argc, char **argv)
   GESRendererProfile qt = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
   GESRendererProfile mkv = { 720, 576, 25, PROFILE_VORBIS_H264_MATROSKA };
 
-  ges_renderer_render (testTL (), "formats", &webm);
-  ges_renderer_render (testTL (), "formats", &ogg);
-  ges_renderer_render (testTL (), "formats", &qt);
-  ges_renderer_render (testTL (), "formats", &mkv);
+  ges_renderer_render (testTL (), "formats", &webm, FALSE);
+  ges_renderer_render (testTL (), "formats", &ogg, FALSE);
+  ges_renderer_render (testTL (), "formats", &qt, FALSE);
+  ges_renderer_render (testTL (), "formats", &mkv, FALSE);
 
   return 0;
 }
