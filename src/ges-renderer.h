@@ -65,15 +65,15 @@ GstEncodingProfile
 gboolean ges_renderer_print_progress (void);
 
 void ges_pipeline_setup_rendering (GESPipeline * pipeline,
-    const gchar * name, GESRendererProfile * profile);
+    const gchar * name, GESRendererProfile * profile, gboolean absolute_paths);
 
 GESPipeline *ges_pipeline_from_timeline (GESTimeline * timeline);
 void ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
-    GESRendererProfile * profile);
+    GESRendererProfile * profile, gboolean absolute_paths);
 
 void ges_renderer_play (GESTimeline * timeline);
 void ges_renderer_render (GESTimeline * timeline, const gchar * name,
-    GESRendererProfile * profile);
+    GESRendererProfile * profile, gboolean absolute_paths);
 
 void ges_renderer_profile_print (GESRendererProfile * profile);
 
