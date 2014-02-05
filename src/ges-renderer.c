@@ -360,7 +360,7 @@ ges_renderer_play (GESTimeline * timeline)
 {
   gchar *name = NULL;
   GESRendererProfile profile = { 0, 0, 0, PROFILE_NONE };
-  ges_renderer_run_job (timeline, name, &profile);
+  ges_renderer_run_job (timeline, name, &profile, FALSE);
 }
 
 void
