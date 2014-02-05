@@ -243,7 +243,7 @@ render_json (JsonNode * root)
       prof = PROFILE_VORBIS_THEORA_OGG;
     }
     res.profile = prof;
-    ges_renderer_render (timeline, name, &res, FALSE);
+    ges_renderer_render (timeline, name, &res, absolute_paths);
   }
   json_reader_end_member (reader);
 
