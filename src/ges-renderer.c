@@ -269,7 +269,7 @@ ges_pipeline_setup_rendering (GESPipeline * pipeline,
 {
   EncodingProfile type = profile->profile;
 
-  gchar *fileName;
+  const gchar *fileName;
 
   if (absolute_paths == TRUE) {
     fileName = name;
