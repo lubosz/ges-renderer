@@ -47,7 +47,7 @@ getBool (JsonReader * reader, const gchar * member_name)
 }
 
 void
-getClips (JsonReader * reader, GESLayer * layer, GESTrackType type)
+getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean absolute_paths)
 {
   int i;
   json_reader_read_member (reader, "clips");
@@ -68,9 +68,15 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type)
       g_print ("multi on.\n");
       clip = ges_multi_clip_from_rel_path (src, layer, start, in, dur);
     } else {
-      clip =
-          ges_clip_from_path (ges_renderer_get_absolute_path (src), layer,
-          start, in, dur, type);
+      const char* path;
+      if (absolute_paths == TRUE) {
+        path = src;
+      } else {
+        path = ges_renderer_get_absolute_path (src);
+      }
+      
+
+      clip = ges_clip_from_path (path, layer, start, in, dur, type);
     }
 
     GESTimeline *tl = ges_layer_get_timeline (layer);
@@ -176,6 +182,12 @@ render_json (JsonNode * root)
     transparency = getBool (reader, "transparency");
   }
 
+  gboolean absolute_paths = TRUE;
+
+  if (is_in_members (reader, "absolute_paths")) {
+    absolute_paths = getBool (reader, "absolute_paths");
+  }
+
   g_print ("Resolution: %dx%d, FPS: %d\n", width, height, fps);
 
   timeline = ges_timeline_new_audio_video ();
@@ -199,7 +211,7 @@ render_json (JsonNode * root)
 
     ges_timeline_add_layer (timeline, layer);
 
-    getClips (reader, layer, GES_TRACK_TYPE_UNKNOWN);
+    getClips (reader, layer, GES_TRACK_TYPE_UNKNOWN, absolute_paths);
 
     json_reader_end_element (reader);
   }
