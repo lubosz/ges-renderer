@@ -55,6 +55,7 @@ ges_renderer_get_absolute_path_win_multifile (const char *rel_path)
   getcwd (directory, 1024);
   char *replaced = replace (directory, '\\', '/');
   data_path = g_strconcat ("file://", replaced, "/data/", NULL);
+
   return g_strconcat (data_path, rel_path, NULL);
 }
 
@@ -98,17 +99,22 @@ ges_clip_unknown_from_rel_path (const gchar * path, GESLayer * layer,
 }
 
 GESClip *
-ges_multi_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
-    gint start, gint in, gint dur)
+ges_multi_clip_from_path (const gchar * rel_path, GESLayer * layer,
+    gint start, gint in, gint dur, gboolean absolute_paths)
 {
+  const gchar * path = NULL;
 
+  if (absolute_paths) {
+    path = rel_path;
+  } else {
 #ifdef PLATTFORM_WINDOWS
-  gchar *multi_path = g_strconcat (
-    "multi", ges_renderer_get_absolute_path_win_multifile (rel_path), NULL);
+    path = ges_renderer_get_absolute_path_win_multifile (rel_path);
 #else
-  gchar *multi_path = g_strconcat (
-    "multi", ges_renderer_get_absolute_path (rel_path), NULL);
+    path = ges_renderer_get_absolute_path (rel_path);
 #endif
+  }
+
+  gchar *multi_path = g_strconcat ("multi", path, NULL);
 
   return ges_clip_from_path (multi_path, layer, start, in, dur,
       GES_TRACK_TYPE_VIDEO);

@@ -54,8 +54,8 @@ GESClip *ges_clip_from_path (const gchar * ges_renderer_get_absolute_path,
     GESLayer * layer, gint start, gint in, gint dur, GESTrackType tt);
 GESClip *ges_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
     gint start, gint in, gint dur, GESTrackType tt);
-GESClip *ges_multi_clip_from_rel_path (const gchar * rel_path, GESLayer * layer,
-    gint start, gint in, gint dur);
+GESClip *ges_multi_clip_from_path (const gchar * rel_path, GESLayer * layer,
+    gint start, gint in, gint dur, gboolean absolute_paths);
 
 void bus_message_cb (GstBus * bus, GstMessage * message, GMainLoop * mainloop);
 
