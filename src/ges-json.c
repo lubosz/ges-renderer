@@ -66,7 +66,7 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
 
     if (is_in_members (reader, "multi") && getBool (reader, "multi")) {
       g_print ("multi on.\n");
-      clip = ges_multi_clip_from_rel_path (src, layer, start, in, dur);
+      clip = ges_multi_clip_from_path (src, layer, start, in, dur, absolute_paths);
     } else {
       const char* path;
       if (absolute_paths == TRUE) {
