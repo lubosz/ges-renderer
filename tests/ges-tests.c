@@ -254,8 +254,8 @@ videoTransparencyTL (void)
   ges_timeline_add_layer (timeline, layer1);
   g_object_set (layer1, "priority", 0, NULL);
 
-  ges_multi_clip_from_rel_path ("transparent/blender-cube/%04d.png",
-      layer1, 0, 0, 10);
+  ges_multi_clip_from_path ("transparent/blender-cube/%04d.png",
+      layer1, 0, 0, 10, FALSE);
 
   //ges_clip_from_rel_path ("transparent/bokeeh-raw.mkv", layer1, 0, 0, 10,
   //    GES_TRACK_TYPE_VIDEO);
