@@ -57,7 +57,7 @@ ges_renderer_get_absolute_path_win_multifile (const char *rel_path)
   char *replaced = replace (directory, '\\', '/');
   data_path = g_strconcat ("file://", replaced, "/data/", NULL);
 
-  file_path = g_strconcat (data_path, rel_path, NULL)
+  file_path = g_strconcat (data_path, rel_path, NULL);
   g_print ("\nWin multifile\n");
   g_print (file_path);
 
