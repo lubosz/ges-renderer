@@ -51,15 +51,17 @@ gchar *
 ges_renderer_get_absolute_path_win_multifile (const char *rel_path)
 {
   gchar *data_path;
+  gchar *file_path;
   gchar directory[1024];
   getcwd (directory, 1024);
   char *replaced = replace (directory, '\\', '/');
   data_path = g_strconcat ("file://", replaced, "/data/", NULL);
 
+  file_path = g_strconcat (data_path, rel_path, NULL)
   g_print ("\nWin multifile\n");
-  g_print (data_path);
+  g_print (file_path);
 
-  return g_strconcat (data_path, rel_path, NULL);
+  return file_path;
 }
 
 gchar *
