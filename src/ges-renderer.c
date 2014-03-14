@@ -287,7 +287,7 @@ ges_pipeline_setup_rendering (GESPipeline * pipeline,
   GstEncodingProfile *gst_profile =
       ges_renderer_profile_get_encoding_profile (profile);
   ges_pipeline_set_render_settings (pipeline, fileName, gst_profile);
-  ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
+  ges_pipeline_set_mode (pipeline, GES_PIPELINE_MODE_RENDER);
 }
 
 GESPipeline *
@@ -295,7 +295,7 @@ ges_pipeline_from_timeline (GESTimeline * timeline)
 {
   GESPipeline *pipeline;
   pipeline = ges_pipeline_new ();
-  ges_pipeline_add_timeline (pipeline, timeline);
+  ges_pipeline_set_timeline (pipeline, timeline);
 
   duration = ges_timeline_get_duration (timeline);
 
@@ -337,7 +337,7 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
   if (name != NULL) {
     ges_pipeline_setup_rendering (pipeline, name, profile, absolute_paths);
   } else {
-    ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
+    ges_pipeline_set_mode (pipeline, GES_PIPELINE_MODE_PREVIEW_VIDEO);
     g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit, mainloop);
   }
 

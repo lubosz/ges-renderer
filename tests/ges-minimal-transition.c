@@ -80,13 +80,13 @@ main (int argc, char **argv)
   duration = ges_timeline_get_duration (timeline);
 
   pipeline = ges_pipeline_new ();
-  ges_pipeline_add_timeline (pipeline, timeline);
+  ges_pipeline_set_timeline (pipeline, timeline);
 
   GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
   GstCaps *settings = gst_caps_from_renderer_profile (&pal);
   GstEncodingProfile *profile = profile_get_encoding_profile (settings);
   ges_pipeline_set_render_settings (pipeline, exportURL, profile);
-  ges_pipeline_set_mode (pipeline, TIMELINE_MODE_RENDER);
+  ges_pipeline_set_mode (pipeline, GES_PIPELINE_MODE_RENDER);
 
   GMainLoop *mainloop;
   mainloop = g_main_loop_new (NULL, FALSE);

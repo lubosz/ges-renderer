@@ -64,7 +64,7 @@ main (int argc, char **argv)
   ges_timeline_commit (timeline);
 
   pipeline = ges_pipeline_new ();
-  ges_pipeline_add_timeline (pipeline, timeline);
+  ges_pipeline_set_timeline (pipeline, timeline);
 
   mainloop = g_main_loop_new (NULL, FALSE);
 

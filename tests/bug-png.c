@@ -88,11 +88,11 @@ main (int argc, char **argv)
   GESTimeline *timeline = pngTL ();
 
   pipeline = ges_pipeline_new ();
-  ges_pipeline_add_timeline (pipeline, timeline);
+  ges_pipeline_set_timeline (pipeline, timeline);
 
   duration = ges_timeline_get_duration (timeline);
 
-  ges_pipeline_set_mode (pipeline, TIMELINE_MODE_PREVIEW_VIDEO);
+  ges_pipeline_set_mode (pipeline, GES_PIPELINE_MODE_PREVIEW_VIDEO);
   g_timeout_add_seconds (duration, (GSourceFunc) g_main_loop_quit, mainloop);
 
   GstBus *bus;
