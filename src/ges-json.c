@@ -74,8 +74,6 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
       } else {
         path = ges_renderer_get_absolute_path (src);
       }
-      
-
       clip = ges_clip_from_path (path, layer, start, in, dur, type);
     }
 
@@ -90,7 +88,6 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
           ges_clip_find_track_element (clip, tracka, G_TYPE_NONE);
       ges_track_element_set_child_properties (audioElement, "volume", volume,
           NULL);
-
     }
 
     GESTrackElement *videoElement =
@@ -132,7 +129,7 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
 
     if (is_in_members (reader, "effect")) {
       const char *effect_str = getString (reader, "effect");
-      if (effect_str != "") {
+      if (strcmp(effect_str, "") != 0) {
         g_print ("Using effect %s", effect_str);
         GESEffect *effect = ges_effect_new (effect_str);
         ges_container_add (GES_CONTAINER (clip), GES_TIMELINE_ELEMENT (effect));        
