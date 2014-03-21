@@ -132,9 +132,11 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
 
     if (is_in_members (reader, "effect")) {
       const char *effect_str = getString (reader, "effect");
-      g_print ("Using effect %s", effect_str);
-      GESEffect *effect = ges_effect_new (effect_str);
-      ges_container_add (GES_CONTAINER (clip), GES_TIMELINE_ELEMENT (effect));
+      if (effect_str != "") {
+        g_print ("Using effect %s", effect_str);
+        GESEffect *effect = ges_effect_new (effect_str);
+        ges_container_add (GES_CONTAINER (clip), GES_TIMELINE_ELEMENT (effect));        
+      }
     }
 
     json_reader_end_element (reader);
