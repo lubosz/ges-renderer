@@ -62,7 +62,7 @@ ges_renderer_get_absolute_path_win_multifile (const char *rel_path)
 gchar *
 ges_renderer_get_absolute_path (const char *rel_path)
 {
-  return g_strconcat (ges_renderer_get_data_uri(), rel_path, NULL);
+  return g_strconcat (ges_renderer_get_data_uri (), rel_path, NULL);
 }
 
 gint
@@ -102,7 +102,7 @@ GESClip *
 ges_multi_clip_from_path (const gchar * rel_path, GESLayer * layer,
     gint start, gint in, gint dur, gboolean absolute_paths)
 {
-  const gchar * path = NULL;
+  const gchar *path = NULL;
 
   if (absolute_paths) {
     path = rel_path;
@@ -280,7 +280,9 @@ ges_pipeline_setup_rendering (GESPipeline * pipeline,
   if (absolute_paths == TRUE) {
     fileName = name;
   } else {
-    fileName = g_strconcat (ges_renderer_get_data_uri(), "export/", name, ".", profiles[type][3], NULL);
+    fileName =
+        g_strconcat (ges_renderer_get_data_uri (), "export/", name, ".",
+        profiles[type][3], NULL);
   }
   g_print ("Rendering %s\n", fileName);
 
