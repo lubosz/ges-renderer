@@ -48,6 +48,7 @@ message("CMAKE_LIBRARY_OUTPUT_PATH ${CMAKE_LIBRARY_OUTPUT_PATH}")
 
 include_directories(
   ${OS_PREFIX}/include/gstreamer-1.0
+  ${OS_PREFIX}/include/gstreamer-1.0/ges
   ${OS_PREFIX}/include/glib-2.0
   ${OS_PREFIX}/lib/glib-2.0/include
   ${OS_PREFIX}/include/json-glib-1.0
