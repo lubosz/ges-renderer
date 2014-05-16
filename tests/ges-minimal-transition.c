@@ -52,9 +52,9 @@ main (int argc, char **argv)
   GError **error = NULL;
   GESAsset *asset;
   const gchar *url =
-      "file:///home/bmonkey/workspace/ges/ges-demos/data/sd/sintel_trailer-480p.mp4";
+      "file:///home/bmonkey/workspace/ges/ges-renderer/data/sd/sintel_trailer-480p.mp4";
   const gchar *exportURL =
-      "file:///home/bmonkey/workspace/ges/ges-demos/transition.mp4";
+      "file:///home/bmonkey/workspace/ges/ges-renderer/transition.mp4";
 
   gst_init (&argc, &argv);
   ges_init ();
