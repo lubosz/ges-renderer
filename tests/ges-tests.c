@@ -447,20 +447,22 @@ tests (void)
 {
   GESRendererProfile hd = { 1280, 720, 30, PROFILE_AAC_H264_QUICKTIME };
   GESRendererProfile pal = { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME };
-  GESRendererProfile pal_noalpha =
-      { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME, "I420" };
 
   ges_renderer_render (effectTL (), "c-effect", &pal, FALSE);
   ges_renderer_render (minuteTL (), "c-minute", &pal, FALSE);
   ges_renderer_render (hdTL (), "c-hd", &hd, FALSE);
   ges_renderer_render (musicTL (), "c-audio", &pal, FALSE);
-  ges_renderer_render (imageTL (), "c-image", &pal_noalpha, FALSE);
-  ges_renderer_render (transitionTL (), "c-transition", &pal_noalpha, FALSE);
-
   ges_renderer_render (compTL (), "c-comp", &hd, FALSE);
-  //ges_renderer_render (volumeTestTL (), "c-volume", &pal, FALSE);
   ges_renderer_render (alphaTestTL (), "c-alpha", &pal, FALSE);
-  ges_renderer_render (videoTransparencyTL (), "c-videoTransparency", &hd, FALSE);
+  ges_renderer_render (videoTransparencyTL (), "c-videoTransparency", &hd,
+      FALSE);
+  ges_renderer_render (volumeTestTL (), "c-volume", &pal, FALSE);
+
+  // alpha bug
+  //GESRendererProfile pal_noalpha =
+  //    { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME, "I420" };
+  //ges_renderer_render (imageTL (), "c-image", &pal_noalpha, FALSE);
+  //ges_renderer_render (transitionTL (), "c-transition", &pal, FALSE);
 }
 
 int
