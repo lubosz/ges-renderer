@@ -132,11 +132,21 @@ GESClip *
 ges_clip_from_path (const gchar * path, GESLayer * layer, gint start, gint in,
     gint dur, GESTrackType tt)
 {
-  GError **error = NULL;
+  GError *error = NULL;
   GESUriClipAsset *asset;
   GESClip *clip;
 
-  asset = ges_uri_clip_asset_request_sync (path, error);
+
+
+  asset = ges_uri_clip_asset_request_sync (path, &error);
+
+  if (error != NULL) {
+    fprintf (stderr, "Unable to read asset: %s\n", error->message);
+    g_print ("path %s\n", path);
+    g_error_free (error);
+    exit (0);
+  }
+
   clip = ges_layer_add_asset (layer, GES_ASSET (asset),
       start * GST_SECOND, in * GST_SECOND, dur * GST_SECOND, tt);
 
