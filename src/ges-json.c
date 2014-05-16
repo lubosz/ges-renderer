@@ -47,7 +47,8 @@ getBool (JsonReader * reader, const gchar * member_name)
 }
 
 void
-getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean absolute_paths)
+getClips (JsonReader * reader, GESLayer * layer, GESTrackType type,
+    gboolean absolute_paths)
 {
   int i;
   json_reader_read_member (reader, "clips");
@@ -66,9 +67,10 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
 
     if (is_in_members (reader, "multi") && getBool (reader, "multi")) {
       g_print ("multi on.\n");
-      clip = ges_multi_clip_from_path (src, layer, start, in, dur, absolute_paths);
+      clip =
+          ges_multi_clip_from_path (src, layer, start, in, dur, absolute_paths);
     } else {
-      const char* path;
+      const char *path;
       if (absolute_paths == TRUE) {
         path = src;
       } else {
@@ -86,53 +88,56 @@ getClips (JsonReader * reader, GESLayer * layer, GESTrackType type, gboolean abs
       double volume = getDouble (reader, "volume");
       GESTrackElement *audioElement =
           ges_clip_find_track_element (clip, tracka, G_TYPE_NONE);
-      ges_track_element_set_child_properties (audioElement, "volume", volume,
-          NULL);
+      if (audioElement != NULL) {
+        ges_track_element_set_child_properties (audioElement, "volume", volume,
+            NULL);
+      }
     }
 
     GESTrackElement *videoElement =
         ges_clip_find_track_element (clip, trackv, G_TYPE_NONE);
 
-    if (is_in_members (reader, "x")) {
-      int x = getInt (reader, "x");
-      ges_track_element_set_child_properties (videoElement, "posx", x, NULL);
-    }
+    if (videoElement != NULL) {
+      if (is_in_members (reader, "x")) {
+        int x = getInt (reader, "x");
+        ges_track_element_set_child_properties (videoElement, "posx", x, NULL);
+      }
+      if (is_in_members (reader, "y")) {
+        int y = getInt (reader, "y");
+        ges_track_element_set_child_properties (videoElement, "posy", y, NULL);
+      }
+      if (is_in_members (reader, "alpha")) {
+        gdouble alpha = getDouble (reader, "alpha");
+        ges_track_element_set_child_properties (videoElement, "alpha", alpha,
+            NULL);
+      }
 
-    if (is_in_members (reader, "y")) {
-      int y = getInt (reader, "y");
-      ges_track_element_set_child_properties (videoElement, "posy", y, NULL);
-    }
+      if (is_in_members (reader, "size")) {
+        gdouble size = getDouble (reader, "size");
+        GESUriClipAsset *asset =
+            GES_URI_CLIP_ASSET (ges_extractable_get_asset (GES_EXTRACTABLE
+                (clip)));
+        guint width = ges_asset_get_width (asset);
+        guint height = ges_asset_get_height (asset);
 
-    if (is_in_members (reader, "alpha")) {
-      gdouble alpha = getDouble (reader, "alpha");
-      ges_track_element_set_child_properties (videoElement, "alpha", alpha,
-          NULL);
-    }
+        if (width != 0 && height != 0) {
+          double dw = width * size;
+          double dh = height * size;
+          g_print ("%dx%d => * %f => %dx%d\n", width, height, size, (int) dw,
+              (int) dh);
+          ges_track_element_set_child_properties (videoElement,
+              "width", (int) dw, "height", (int) dh, NULL);
+        }
+      }
 
-    if (is_in_members (reader, "size")) {
-      gdouble size = getDouble (reader, "size");
-      GESUriClipAsset *asset =
-          GES_URI_CLIP_ASSET (ges_extractable_get_asset (GES_EXTRACTABLE
-              (clip)));
-      guint width = ges_asset_get_width (asset);
-      guint height = ges_asset_get_height (asset);
-      double dw = width * size;
-      double dh = height * size;
-
-      g_print ("%dx%d => * %f => %dx%d\n", width, height, size, (int) dw,
-          (int) dh);
-
-      ges_track_element_set_child_properties (videoElement,
-          "width", (int) dw, "height", (int) dh, NULL);
-
-    }
-
-    if (is_in_members (reader, "effect")) {
-      const char *effect_str = getString (reader, "effect");
-      if (strcmp(effect_str, "") != 0) {
-        g_print ("Using effect %s", effect_str);
-        GESEffect *effect = ges_effect_new (effect_str);
-        ges_container_add (GES_CONTAINER (clip), GES_TIMELINE_ELEMENT (effect));        
+      if (is_in_members (reader, "effect")) {
+        const char *effect_str = getString (reader, "effect");
+        if (strcmp (effect_str, "") != 0) {
+          g_print ("Using effect %s", effect_str);
+          GESEffect *effect = ges_effect_new (effect_str);
+          ges_container_add (GES_CONTAINER (clip),
+              GES_TIMELINE_ELEMENT (effect));
+        }
       }
     }
 
@@ -219,12 +224,13 @@ render_json (JsonNode * root)
   ges_timeline_commit (timeline);
 
   // formats
-  GESRendererProfile res = { width, height, fps, PROFILE_AAC_H264_QUICKTIME, NULL };
+  GESRendererProfile res =
+      { width, height, fps, PROFILE_AAC_H264_QUICKTIME, NULL };
   if (!transparency) {
-    g_print("Deactivating transparency\n");
+    g_print ("Deactivating transparency\n");
     res.format = "I420";
   }
-      
+
   json_reader_read_member (reader, "formats");
   for (i = 0; i < json_reader_count_elements (reader); i++) {
     json_reader_read_element (reader, i);

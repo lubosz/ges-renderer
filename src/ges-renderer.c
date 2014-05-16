@@ -136,8 +136,6 @@ ges_clip_from_path (const gchar * path, GESLayer * layer, gint start, gint in,
   GESUriClipAsset *asset;
   GESClip *clip;
 
-
-
   asset = ges_uri_clip_asset_request_sync (path, &error);
 
   if (error != NULL) {
