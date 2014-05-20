@@ -239,6 +239,12 @@ render_json (const char *filename)
 
   ges_timeline_commit (timeline);
 
+  const gchar *xges_path = g_strconcat ("file://", filename, ".xges", NULL);
+
+  ges_timeline_save_xges (timeline, xges_path);
+
+  //free(xges_path);
+
   // formats
   GESRendererProfile res =
       { width, height, fps, PROFILE_AAC_H264_QUICKTIME, NULL };

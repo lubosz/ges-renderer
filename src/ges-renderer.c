@@ -120,6 +120,23 @@ ges_multi_clip_from_path (const gchar * rel_path, GESLayer * layer,
       GES_TRACK_TYPE_VIDEO);
 }
 
+void
+ges_timeline_save_xges (GESTimeline * timeline, const gchar * path)
+{
+  GESAsset *formatter_asset =
+      ges_asset_request (GES_TYPE_XML_FORMATTER, NULL, NULL);
+  GError *error = NULL;
+
+  ges_timeline_save_to_uri (timeline, path, formatter_asset, TRUE, &error);
+
+  if (error != NULL) {
+    fprintf (stderr, "Unable to save xges to %s: %s\n", path, error->message);
+    g_error_free (error);
+    exit (0);
+  }
+}
+
+
 GESClip *
 ges_clip_from_rel_path (const gchar * rel_path, GESLayer * layer, gint start,
     gint in, gint dur, GESTrackType tt)

@@ -28,6 +28,7 @@ GESTimeline *positionTestTL (void);
 GESTimeline *alphaTestTL (void);
 GESTimeline *compTL (void);
 void tests (void);
+void save_xges (GESTimeline * timeline, const gchar * name);
 
 GESTimeline *
 testPatternTL (void)
@@ -443,6 +444,15 @@ positionTestTL (void)
 }
 
 void
+save_xges (GESTimeline * timeline, const gchar * name)
+{
+  const gchar *xges_path =
+      g_strconcat (ges_renderer_get_data_uri (), "xges/", name, ".xges", NULL);
+
+  ges_timeline_save_xges (timeline, xges_path);
+}
+
+void
 tests (void)
 {
   GESRendererProfile hd = { 1280, 720, 30, PROFILE_AAC_H264_QUICKTIME };
@@ -463,6 +473,17 @@ tests (void)
   //    { 720, 576, 25, PROFILE_AAC_H264_QUICKTIME, "I420" };
   //ges_renderer_render (imageTL (), "c-image", &pal_noalpha, FALSE);
   //ges_renderer_render (transitionTL (), "c-transition", &pal, FALSE);
+
+//  save_xges (effectTL (), "c-effect");
+//  save_xges (minuteTL (), "c-minute");
+//  save_xges (hdTL (), "c-hd");
+//  save_xges (musicTL (), "c-audio");
+//  save_xges (compTL (), "c-comp");
+//  save_xges (alphaTestTL (), "c-alpha");
+//  save_xges (videoTransparencyTL (), "c-videoTransparency");
+//  save_xges (volumeTestTL (), "c-volume");
+//  save_xges (imageTL (), "c-image");
+//  save_xges (transitionTL (), "c-transition");
 }
 
 int

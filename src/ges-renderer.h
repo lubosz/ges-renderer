@@ -42,6 +42,8 @@ struct GESRendererProfile
   const gchar* format;
 };
 
+void ges_timeline_save_xges(GESTimeline * timeline, const gchar * path);
+
 gchar *ges_renderer_get_absolute_path (const char *rel_path);
 gchar *ges_renderer_get_data_uri (void);
 gchar *ges_renderer_get_absolute_path_win_multifile (const char *rel_path);
