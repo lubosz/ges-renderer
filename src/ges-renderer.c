@@ -364,9 +364,9 @@ ges_renderer_run_job (GESTimeline * timeline, const gchar * name,
       GST_DEBUG_GRAPH_SHOW_ALL, "ges-renderer");
 
   g_main_loop_run (mainloop);
+  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
   g_main_loop_unref (mainloop);
 
-  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 
   gst_object_unref (pipeline);
 }
