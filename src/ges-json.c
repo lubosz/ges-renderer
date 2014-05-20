@@ -163,8 +163,24 @@ is_in_members (JsonReader * reader, const char *member)
 }
 
 void
-render_json (JsonNode * root)
+render_json (const char *filename)
 {
+  JsonParser *parser;
+  JsonNode *root;
+  GError *error;
+  parser = json_parser_new ();
+
+  error = NULL;
+  json_parser_load_from_file (parser, filename, &error);
+  if (error) {
+    g_print ("Parsing error `%s':\n %s\n", filename, error->message);
+    g_error_free (error);
+    g_object_unref (parser);
+    exit (0);
+  }
+
+  root = json_parser_get_root (parser);
+
   JsonReader *reader = json_reader_new (root);
   GESTimeline *timeline;
 
@@ -255,6 +271,7 @@ render_json (JsonNode * root)
   json_reader_end_member (reader);
 
   g_object_unref (reader);
+  g_object_unref (parser);
 }
 
 int
@@ -263,37 +280,16 @@ main (int argc, char *argv[])
 #ifdef PLATTFORM_WINDOWS
   LoadLibrary ("exchndl.dll");
 #endif
-  JsonParser *parser;
-  JsonNode *root;
-  GError *error;
-
   if (argc < 2) {
     g_print ("Usage: ./ges-json <filename.json>\n");
     return EXIT_FAILURE;
   }
-
-  parser = json_parser_new ();
-
-  error = NULL;
-  json_parser_load_from_file (parser, argv[1], &error);
-  if (error) {
-    g_print ("Parsing error `%s':\n %s\n", argv[1], error->message);
-    g_error_free (error);
-    g_object_unref (parser);
-    return EXIT_FAILURE;
-  }
-
-  root = json_parser_get_root (parser);
-
-
   gst_init (&argc, &argv);
   ges_init ();
 
   ges_renderer_init ();
 
-  render_json (root);
-
-  g_object_unref (parser);
+  render_json (argv[1]);
 
   return EXIT_SUCCESS;
 }
